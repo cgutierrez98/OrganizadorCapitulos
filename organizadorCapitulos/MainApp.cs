@@ -13,23 +13,40 @@ namespace organizadorCapitulos
         private string[] videoExtensions = { ".mp4", ".avi", ".mkv", ".mov", ".wmv", ".flv", ".mpeg", ".webm" };
         private SortOrder lastSortOrder = SortOrder.None;
         private int lastColumnSorted = -1;
+
         public MainForm()
         {
             InitializeComponent();
+            ConfigureValidation();
+        }
+
+        private void ConfigureValidation()
+        {
+            txtTemporada.Validating += txtTemporada_Validating;
+            txtCapitulo.Validating += txtCapitulo_Validating;
+            txtTitulo.Validating += txtTitulo_Validating;
         }
 
         private void listViewSeries_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (listViewSeries.SelectedItems.Count > 0 && radioCambiar.Checked)
+            if (listViewSeries.SelectedItems.Count > 0)
             {
-                string fileName = listViewSeries.SelectedItems[0].Text;
-                string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(fileName);
-                txtTitulo.Text = fileNameWithoutExtension;
+                if (radioCambiar.Checked)
+                {
+                    string fileName = listViewSeries.SelectedItems[0].Text;
+                    string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(fileName);
+                    txtTitulo.Text = fileNameWithoutExtension;
+                }
+
+                // Habilitar el botón de guardar cuando hay selección
+                btnGuardar.Enabled = true;
+            }
+            else
+            {
+                btnGuardar.Enabled = false;
             }
         }
-        
 
-      
         private void listViewSeries_ColumnClick(object sender, ColumnClickEventArgs e)
         {
             if (e.Column == lastColumnSorted)
@@ -72,7 +89,7 @@ namespace organizadorCapitulos
                 return;
             }
 
-            if (!ValidarCampos())
+            if (!ValidateChildren(ValidationConstraints.Enabled))
                 return;
 
             ListViewItem selectedItem = listViewSeries.SelectedItems[0];
@@ -85,22 +102,24 @@ namespace organizadorCapitulos
 
             try
             {
-                // Verificar si el archivo de destino ya existe
                 if (File.Exists(nuevoFilePath))
                 {
-                    MessageBox.Show($"Ya existe un archivo con el nombre {nuevoNombre} en esta ubicación.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
+                    var result = MessageBox.Show($"Ya existe un archivo con el nombre {nuevoNombre} en esta ubicación. ¿Desea sobrescribirlo?",
+                        "Confirmación", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+                    if (result != DialogResult.Yes)
+                        return;
                 }
 
-                // Renombrar el archivo
                 File.Move(originalFilePath, nuevoFilePath);
 
-                // Actualizar el ListView con el nuevo nombre y ruta
                 selectedItem.Text = nuevoNombre;
                 selectedItem.SubItems[1].Text = nuevoFilePath;
 
-                // Incrementar el número de capítulo para el próximo archivo
-                IncrementarCapitulo();
+                if (radioMantener.Checked)
+                {
+                    IncrementarCapitulo();
+                }
 
                 MessageBox.Show("Archivo renombrado exitosamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
@@ -149,9 +168,12 @@ namespace organizadorCapitulos
                         processedFiles++;
                         progressForm.UpdateProgress(processedFiles, totalFiles, fileName);
 
-                         File.Move(originalFilePath, destinoPath);
+                        if (File.Exists(destinoPath))
+                        {
+                            File.Delete(destinoPath);
+                        }
 
-                        //await CopyLargeFileAsync(originalFilePath, destinoPath);
+                        await CopyLargeFileAsync(originalFilePath, destinoPath);
                     }
                     catch (Exception ex)
                     {
@@ -229,29 +251,6 @@ namespace organizadorCapitulos
             }
         }
 
-        private bool ValidarCampos()
-        {
-            if (string.IsNullOrWhiteSpace(txtTitulo.Text))
-            {
-                MessageBox.Show("Por favor ingrese un título válido.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return false;
-            }
-
-            if (!int.TryParse(txtTemporada.Text, out _))
-            {
-                MessageBox.Show("Por favor ingrese un número de temporada válido.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return false;
-            }
-
-            if (!int.TryParse(txtCapitulo.Text, out _))
-            {
-                MessageBox.Show("Por favor ingrese un número de capítulo válido.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return false;
-            }
-
-            return true;
-        }
-
         private string GenerarNuevoNombre(string extension)
         {
             int temporada = int.Parse(txtTemporada.Text);
@@ -275,6 +274,81 @@ namespace organizadorCapitulos
             {
                 await sourceStream.CopyToAsync(destinationStream, bufferSize);
             }
+        }
+
+        #region Validation Methods
+        private void txtNumerico_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
+            {
+                e.Handled = true;
+            }
+        }
+
+        private void txtTemporada_Validating(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(txtTemporada.Text) || !int.TryParse(txtTemporada.Text, out int temp) || temp <= 0)
+            {
+                errorProvider.SetError(txtTemporada, "Ingrese un número de temporada válido (mayor que 0)");
+                e.Cancel = true;
+            }
+            else
+            {
+                errorProvider.SetError(txtTemporada, "");
+            }
+        }
+
+        private void txtCapitulo_Validating(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(txtCapitulo.Text) || !int.TryParse(txtCapitulo.Text, out int cap) || cap <= 0)
+            {
+                errorProvider.SetError(txtCapitulo, "Ingrese un número de capítulo válido (mayor que 0)");
+                e.Cancel = true;
+            }
+            else
+            {
+                errorProvider.SetError(txtCapitulo, "");
+            }
+        }
+
+        private void txtTitulo_Validating(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(txtTitulo.Text))
+            {
+                errorProvider.SetError(txtTitulo, "El título no puede estar vacío");
+                e.Cancel = true;
+            }
+            else if (txtTitulo.Text.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0)
+            {
+                errorProvider.SetError(txtTitulo, "El título contiene caracteres no válidos para un nombre de archivo");
+                e.Cancel = true;
+            }
+            else
+            {
+                errorProvider.SetError(txtTitulo, "");
+            }
+        }
+        #endregion
+    }
+
+    public class ListViewItemComparer : System.Collections.IComparer
+    {
+        private readonly int col;
+        private readonly SortOrder order;
+
+        public ListViewItemComparer(int column, SortOrder sortOrder)
+        {
+            col = column;
+            order = sortOrder;
+        }
+
+        public int Compare(object x, object y)
+        {
+            int returnVal = string.Compare(
+                ((ListViewItem)x).SubItems[col].Text,
+                ((ListViewItem)y).SubItems[col].Text);
+
+            return order == SortOrder.Ascending ? returnVal : -returnVal;
         }
     }
 }

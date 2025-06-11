@@ -1,4 +1,9 @@
-﻿namespace organizadorCapitulos
+﻿using System;
+using System.Drawing;
+using System.Windows.Forms;
+using System.ComponentModel;
+
+namespace organizadorCapitulos
 {
     partial class MainForm
     {
@@ -15,6 +20,8 @@
 
         private void InitializeComponent()
         {
+            components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             listViewSeries = new ListView();
             columnHeader1 = new ColumnHeader();
             columnHeader2 = new ColumnHeader();
@@ -22,7 +29,11 @@
             btnGuardarTodo = new Button();
             tableLayoutPanel1 = new TableLayoutPanel();
             panel1 = new Panel();
+            groupBoxOpciones = new GroupBox();
+            radioCambiar = new RadioButton();
+            radioMantener = new RadioButton();
             panel2 = new Panel();
+            groupBoxDetalles = new GroupBox();
             btnGuardar = new Button();
             txtCapitulo = new TextBox();
             label3 = new Label();
@@ -30,22 +41,28 @@
             label2 = new Label();
             label1 = new Label();
             txtTitulo = new TextBox();
-            radioMantener = new RadioButton();
-            radioCambiar = new RadioButton();
+            errorProvider = new ErrorProvider(components);
             tableLayoutPanel1.SuspendLayout();
             panel1.SuspendLayout();
+            groupBoxOpciones.SuspendLayout();
             panel2.SuspendLayout();
+            groupBoxDetalles.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)errorProvider).BeginInit();
             SuspendLayout();
             // 
             // listViewSeries
             // 
+            listViewSeries.BackColor = Color.White;
+            listViewSeries.BorderStyle = BorderStyle.FixedSingle;
             listViewSeries.Columns.AddRange(new ColumnHeader[] { columnHeader1, columnHeader2 });
             listViewSeries.Dock = DockStyle.Fill;
+            listViewSeries.Font = new Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point);
             listViewSeries.FullRowSelect = true;
             listViewSeries.GridLines = true;
-            listViewSeries.Location = new Point(3, 48);
+            listViewSeries.Location = new Point(10, 60);
+            listViewSeries.Margin = new Padding(10);
             listViewSeries.Name = "listViewSeries";
-            listViewSeries.Size = new Size(1602, 717);
+            listViewSeries.Size = new Size(1588, 647);
             listViewSeries.TabIndex = 0;
             listViewSeries.UseCompatibleStateImageBehavior = false;
             listViewSeries.View = View.Details;
@@ -55,7 +72,7 @@
             // columnHeader1
             // 
             columnHeader1.Text = "Nombre del archivo";
-            columnHeader1.Width = 300;
+            columnHeader1.Width = 350;
             // 
             // columnHeader2
             // 
@@ -65,27 +82,44 @@
             // btnCargarCarpetas
             // 
             btnCargarCarpetas.Anchor = AnchorStyles.Left;
-            btnCargarCarpetas.Location = new Point(3, 3);
+            btnCargarCarpetas.BackColor = Color.SteelBlue;
+            btnCargarCarpetas.FlatAppearance.BorderSize = 0;
+            btnCargarCarpetas.FlatStyle = FlatStyle.Flat;
+            btnCargarCarpetas.Font = new Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point);
+            btnCargarCarpetas.ForeColor = Color.White;
+            btnCargarCarpetas.Image = (Image)resources.GetObject("btnCargarCarpetas.Image");
+            btnCargarCarpetas.ImageAlign = ContentAlignment.MiddleLeft;
+            btnCargarCarpetas.Location = new Point(10, 12);
             btnCargarCarpetas.Name = "btnCargarCarpetas";
-            btnCargarCarpetas.Size = new Size(120, 35);
+            btnCargarCarpetas.Size = new Size(150, 35);
             btnCargarCarpetas.TabIndex = 1;
-            btnCargarCarpetas.Text = "Cargar carpetas";
-            btnCargarCarpetas.UseVisualStyleBackColor = true;
+            btnCargarCarpetas.Text = "  Cargar carpetas";
+            btnCargarCarpetas.TextImageRelation = TextImageRelation.ImageBeforeText;
+            btnCargarCarpetas.UseVisualStyleBackColor = false;
             btnCargarCarpetas.Click += btnCargarCarpetas_Click;
             // 
             // btnGuardarTodo
             // 
             btnGuardarTodo.Anchor = AnchorStyles.Right;
-            btnGuardarTodo.Location = new Point(1465, 3);
+            btnGuardarTodo.BackColor = Color.SeaGreen;
+            btnGuardarTodo.FlatAppearance.BorderSize = 0;
+            btnGuardarTodo.FlatStyle = FlatStyle.Flat;
+            btnGuardarTodo.Font = new Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point);
+            btnGuardarTodo.ForeColor = Color.White;
+            btnGuardarTodo.Image = (Image)resources.GetObject("btnGuardarTodo.Image");
+            btnGuardarTodo.ImageAlign = ContentAlignment.MiddleLeft;
+            btnGuardarTodo.Location = new Point(1442, 12);
             btnGuardarTodo.Name = "btnGuardarTodo";
-            btnGuardarTodo.Size = new Size(120, 35);
+            btnGuardarTodo.Size = new Size(150, 35);
             btnGuardarTodo.TabIndex = 2;
-            btnGuardarTodo.Text = "Guardar todo";
-            btnGuardarTodo.UseVisualStyleBackColor = true;
+            btnGuardarTodo.Text = "  Guardar todo";
+            btnGuardarTodo.TextImageRelation = TextImageRelation.ImageBeforeText;
+            btnGuardarTodo.UseVisualStyleBackColor = false;
             btnGuardarTodo.Click += btnGuardarTodo_Click;
             // 
             // tableLayoutPanel1
             // 
+            tableLayoutPanel1.BackColor = SystemColors.Control;
             tableLayoutPanel1.ColumnCount = 1;
             tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
             tableLayoutPanel1.Controls.Add(panel1, 0, 0);
@@ -95,122 +129,171 @@
             tableLayoutPanel1.Location = new Point(0, 0);
             tableLayoutPanel1.Name = "tableLayoutPanel1";
             tableLayoutPanel1.RowCount = 3;
-            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Absolute, 45F));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Absolute, 60F));
             tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Absolute, 100F));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Absolute, 150F));
             tableLayoutPanel1.Size = new Size(1608, 868);
             tableLayoutPanel1.TabIndex = 3;
             // 
             // panel1
             // 
-            panel1.Controls.Add(radioCambiar);
-            panel1.Controls.Add(radioMantener);
+            panel1.BackColor = Color.White;
+            panel1.Controls.Add(groupBoxOpciones);
             panel1.Controls.Add(btnCargarCarpetas);
             panel1.Controls.Add(btnGuardarTodo);
             panel1.Dock = DockStyle.Fill;
-            panel1.Location = new Point(3, 3);
+            panel1.Location = new Point(0, 0);
+            panel1.Margin = new Padding(0);
             panel1.Name = "panel1";
-            panel1.Size = new Size(1602, 39);
+            panel1.Size = new Size(1608, 60);
             panel1.TabIndex = 3;
+            // 
+            // groupBoxOpciones
+            // 
+            groupBoxOpciones.Anchor = AnchorStyles.Top;
+            groupBoxOpciones.Controls.Add(radioCambiar);
+            groupBoxOpciones.Controls.Add(radioMantener);
+            groupBoxOpciones.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            groupBoxOpciones.Location = new Point(650, 5);
+            groupBoxOpciones.Name = "groupBoxOpciones";
+            groupBoxOpciones.Size = new Size(300, 50);
+            groupBoxOpciones.TabIndex = 5;
+            groupBoxOpciones.TabStop = false;
+            groupBoxOpciones.Text = "Modo de renombrado";
+            // 
+            // radioCambiar
+            // 
+            radioCambiar.AutoSize = true;
+            radioCambiar.Location = new Point(170, 20);
+            radioCambiar.Name = "radioCambiar";
+            radioCambiar.Size = new Size(120, 19);
+            radioCambiar.TabIndex = 4;
+            radioCambiar.Text = "Cambiar estructura";
+            radioCambiar.UseVisualStyleBackColor = true;
+            // 
+            // radioMantener
+            // 
+            radioMantener.AutoSize = true;
+            radioMantener.Checked = true;
+            radioMantener.Location = new Point(20, 20);
+            radioMantener.Name = "radioMantener";
+            radioMantener.Size = new Size(130, 19);
+            radioMantener.TabIndex = 3;
+            radioMantener.TabStop = true;
+            radioMantener.Text = "Mantener estructura";
+            radioMantener.UseVisualStyleBackColor = true;
             // 
             // panel2
             // 
-            panel2.Controls.Add(btnGuardar);
-            panel2.Controls.Add(txtCapitulo);
-            panel2.Controls.Add(label3);
-            panel2.Controls.Add(txtTemporada);
-            panel2.Controls.Add(label2);
-            panel2.Controls.Add(label1);
-            panel2.Controls.Add(txtTitulo);
+            panel2.BackColor = Color.White;
+            panel2.Controls.Add(groupBoxDetalles);
             panel2.Dock = DockStyle.Fill;
-            panel2.Location = new Point(3, 771);
+            panel2.Location = new Point(10, 718);
+            panel2.Margin = new Padding(10);
             panel2.Name = "panel2";
-            panel2.Size = new Size(1602, 94);
+            panel2.Size = new Size(1588, 140);
             panel2.TabIndex = 4;
+            // 
+            // groupBoxDetalles
+            // 
+            groupBoxDetalles.Controls.Add(btnGuardar);
+            groupBoxDetalles.Controls.Add(txtCapitulo);
+            groupBoxDetalles.Controls.Add(label3);
+            groupBoxDetalles.Controls.Add(txtTemporada);
+            groupBoxDetalles.Controls.Add(label2);
+            groupBoxDetalles.Controls.Add(label1);
+            groupBoxDetalles.Controls.Add(txtTitulo);
+            groupBoxDetalles.Dock = DockStyle.Fill;
+            groupBoxDetalles.Font = new Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point);
+            groupBoxDetalles.Location = new Point(0, 0);
+            groupBoxDetalles.Name = "groupBoxDetalles";
+            groupBoxDetalles.Size = new Size(1588, 140);
+            groupBoxDetalles.TabIndex = 7;
+            groupBoxDetalles.TabStop = false;
+            groupBoxDetalles.Text = "Detalles del capítulo seleccionado";
             // 
             // btnGuardar
             // 
             btnGuardar.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            btnGuardar.Location = new Point(1465, 15);
+            btnGuardar.BackColor = Color.DodgerBlue;
+            btnGuardar.FlatAppearance.BorderSize = 0;
+            btnGuardar.FlatStyle = FlatStyle.Flat;
+            btnGuardar.ForeColor = Color.White;
+            btnGuardar.Image = (Image)resources.GetObject("btnGuardar.Image");
+            btnGuardar.ImageAlign = ContentAlignment.MiddleLeft;
+            btnGuardar.Location = new Point(1420, 80);
             btnGuardar.Name = "btnGuardar";
-            btnGuardar.Size = new Size(120, 35);
+            btnGuardar.Size = new Size(150, 35);
             btnGuardar.TabIndex = 6;
-            btnGuardar.Text = "Guardar";
-            btnGuardar.UseVisualStyleBackColor = true;
+            btnGuardar.Text = "  Guardar cambios";
+            btnGuardar.TextImageRelation = TextImageRelation.ImageBeforeText;
+            btnGuardar.UseVisualStyleBackColor = false;
             btnGuardar.Click += btnGuardar_Click;
             // 
             // txtCapitulo
             // 
-            txtCapitulo.Location = new Point(220, 49);
+            txtCapitulo.BorderStyle = BorderStyle.FixedSingle;
+            txtCapitulo.Location = new Point(240, 85);
+            txtCapitulo.MaxLength = 3;
             txtCapitulo.Name = "txtCapitulo";
-            txtCapitulo.Size = new Size(50, 23);
+            txtCapitulo.Size = new Size(60, 25);
             txtCapitulo.TabIndex = 5;
             txtCapitulo.Text = "1";
+            txtCapitulo.KeyPress += txtNumerico_KeyPress;
+            txtCapitulo.Validating += txtCapitulo_Validating;
             // 
             // label3
             // 
             label3.AutoSize = true;
-            label3.Location = new Point(160, 52);
+            label3.Location = new Point(180, 88);
             label3.Name = "label3";
-            label3.Size = new Size(55, 15);
+            label3.Size = new Size(60, 17);
             label3.TabIndex = 4;
             label3.Text = "Capítulo:";
             // 
             // txtTemporada
             // 
-            txtTemporada.Location = new Point(90, 49);
+            txtTemporada.BorderStyle = BorderStyle.FixedSingle;
+            txtTemporada.Location = new Point(90, 85);
+            txtTemporada.MaxLength = 2;
             txtTemporada.Name = "txtTemporada";
-            txtTemporada.Size = new Size(50, 23);
+            txtTemporada.Size = new Size(60, 25);
             txtTemporada.TabIndex = 3;
             txtTemporada.Text = "1";
+            txtTemporada.KeyPress += txtNumerico_KeyPress;
+            txtTemporada.Validating += txtTemporada_Validating;
             // 
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(20, 52);
+            label2.Location = new Point(20, 88);
             label2.Name = "label2";
-            label2.Size = new Size(70, 15);
+            label2.Size = new Size(80, 17);
             label2.TabIndex = 2;
             label2.Text = "Temporada:";
             // 
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(20, 18);
+            label1.Location = new Point(20, 40);
             label1.Name = "label1";
-            label1.Size = new Size(41, 15);
+            label1.Size = new Size(45, 17);
             label1.TabIndex = 1;
             label1.Text = "Título:";
             // 
             // txtTitulo
             // 
             txtTitulo.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            txtTitulo.Location = new Point(70, 15);
+            txtTitulo.BorderStyle = BorderStyle.FixedSingle;
+            txtTitulo.Location = new Point(90, 37);
             txtTitulo.Name = "txtTitulo";
-            txtTitulo.Size = new Size(1380, 23);
+            txtTitulo.Size = new Size(1480, 25);
             txtTitulo.TabIndex = 0;
+            txtTitulo.Validating += txtTitulo_Validating;
             // 
-            // radioMantener
+            // errorProvider
             // 
-            radioMantener.AutoSize = true;
-            radioMantener.Location = new Point(1064, 10);
-            radioMantener.Name = "radioMantener";
-            radioMantener.Size = new Size(76, 19);
-            radioMantener.TabIndex = 3;
-            radioMantener.TabStop = true;
-            radioMantener.Text = "Mantener";
-            radioMantener.UseVisualStyleBackColor = true;
-            // 
-            // radioCambiar
-            // 
-            radioCambiar.AutoSize = true;
-            radioCambiar.Location = new Point(1187, 11);
-            radioCambiar.Name = "radioCambiar";
-            radioCambiar.Size = new Size(70, 19);
-            radioCambiar.TabIndex = 4;
-            radioCambiar.TabStop = true;
-            radioCambiar.Text = "Cambiar";
-            radioCambiar.UseVisualStyleBackColor = true;
+            errorProvider.ContainerControl = this;
             // 
             // MainForm
             // 
@@ -218,15 +301,19 @@
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1608, 868);
             Controls.Add(tableLayoutPanel1);
-            MinimumSize = new Size(800, 500);
+            Icon = (Icon)resources.GetObject("$this.Icon");
+            MinimumSize = new Size(900, 600);
             Name = "MainForm";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Organizador de Capítulos";
             tableLayoutPanel1.ResumeLayout(false);
             panel1.ResumeLayout(false);
-            panel1.PerformLayout();
+            groupBoxOpciones.ResumeLayout(false);
+            groupBoxOpciones.PerformLayout();
             panel2.ResumeLayout(false);
-            panel2.PerformLayout();
+            groupBoxDetalles.ResumeLayout(false);
+            groupBoxDetalles.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)errorProvider).EndInit();
             ResumeLayout(false);
         }
 
@@ -247,5 +334,8 @@
         private Button btnGuardar;
         private RadioButton radioCambiar;
         private RadioButton radioMantener;
+        private GroupBox groupBoxOpciones;
+        private GroupBox groupBoxDetalles;
+        private ErrorProvider errorProvider;
     }
 }
