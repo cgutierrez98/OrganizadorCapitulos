@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Windows.Forms;
 
@@ -7,6 +8,7 @@ namespace organizadorCapitulos
     public partial class FolderBrowserForm : Form
     {
         public List<string> SelectedFolders { get; private set; } = new List<string>();
+        public bool IsSingleSelectionMode { get; set; } = false;
 
         public FolderBrowserForm()
         {
@@ -17,7 +19,7 @@ namespace organizadorCapitulos
         private void InitializeTreeView()
         {
             treeViewFolders.CheckBoxes = true;
-            treeViewFolders.AfterCheck += TreeViewFolders_AfterCheck;
+            // treeViewFolders.AfterCheck += treeViewFolders_AfterCheck; // Removed to avoid double subscription (already in Designer)
 
             // Agregar unidades lógicas
             foreach (DriveInfo drive in DriveInfo.GetDrives())
@@ -58,15 +60,50 @@ namespace organizadorCapitulos
             }
         }
 
-        private void TreeViewFolders_AfterCheck(object sender, TreeViewEventArgs e)
+        private void treeViewFolders_AfterCheck(object sender, TreeViewEventArgs e)
         {
-            if (e.Node.Checked)
+            // Evitar reentrancia si estamos modificando programáticamente
+            treeViewFolders.AfterCheck -= treeViewFolders_AfterCheck;
+
+            try
             {
-                SelectedFolders.Add(e.Node.Tag.ToString());
+                if (IsSingleSelectionMode && e.Node.Checked)
+                {
+                    UncheckOtherNodes(treeViewFolders.Nodes, e.Node);
+                    SelectedFolders.Clear(); // Limpiar selección anterior
+                }
+
+                if (e.Node.Checked)
+                {
+                    if (!SelectedFolders.Contains(e.Node.Tag.ToString()))
+                        SelectedFolders.Add(e.Node.Tag.ToString());
+                }
+                else
+                {
+                    SelectedFolders.Remove(e.Node.Tag.ToString());
+                }
+
+                // Actualizar el contador de carpetas seleccionadas
+                int selectedCount = CountCheckedNodes(treeViewFolders.Nodes);
+                lblStatus.Text = IsSingleSelectionMode
+                    ? (selectedCount > 0 ? "Carpeta seleccionada" : "Ninguna carpeta seleccionada")
+                    : $"{selectedCount} carpetas seleccionadas";
             }
-            else
+            finally
             {
-                SelectedFolders.Remove(e.Node.Tag.ToString());
+                treeViewFolders.AfterCheck += treeViewFolders_AfterCheck;
+            }
+        }
+
+        private void UncheckOtherNodes(TreeNodeCollection nodes, TreeNode current)
+        {
+            foreach (TreeNode node in nodes)
+            {
+                if (node != current && node.Checked)
+                {
+                    node.Checked = false;
+                }
+                UncheckOtherNodes(node.Nodes, current);
             }
         }
 
@@ -87,6 +124,12 @@ namespace organizadorCapitulos
                 return;
             }
 
+            if (IsSingleSelectionMode && SelectedFolders.Count > 1)
+            {
+                MessageBox.Show("Por favor seleccione solo una carpeta destino.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
             this.DialogResult = DialogResult.OK;
             this.Close();
         }
@@ -95,13 +138,6 @@ namespace organizadorCapitulos
         {
             this.DialogResult = DialogResult.Cancel;
             this.Close();
-        }
-
-        private void treeViewFolders_AfterCheck(object sender, TreeViewEventArgs e)
-        {
-            // Actualizar el contador de carpetas seleccionadas
-            int selectedCount = CountCheckedNodes(treeViewFolders.Nodes);
-            lblStatus.Text = $"{selectedCount} carpetas seleccionadas";
         }
 
         private int CountCheckedNodes(TreeNodeCollection nodes)

@@ -397,13 +397,16 @@ namespace organizadorCapitulos
 
         private string SeleccionarCarpeta()
         {
-            using (var folderDialog = new FolderBrowserDialog())
+            using (var folderBrowser = new FolderBrowserForm())
             {
-                folderDialog.Description = "Selecciona una carpeta destino";
-                folderDialog.RootFolder = Environment.SpecialFolder.MyComputer;
-                folderDialog.ShowNewFolderButton = true;
+                folderBrowser.Text = "Selecciona Carpeta Destino";
+                folderBrowser.IsSingleSelectionMode = true;
 
-                return folderDialog.ShowDialog() == DialogResult.OK ? folderDialog.SelectedPath : null;
+                if (folderBrowser.ShowDialog(this) == DialogResult.OK && folderBrowser.SelectedFolders.Count > 0)
+                {
+                    return folderBrowser.SelectedFolders[0];
+                }
+                return null;
             }
         }
         #endregion
@@ -420,7 +423,7 @@ namespace organizadorCapitulos
             UpdateStatus($"Procesando {current} de {total} archivos: {filename}");
         }
 
-      
+
         #endregion
 
         #region Validation Methods
