@@ -1,7 +1,10 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
-using System.ComponentModel;
+using System.Xml.Linq;
+using static System.Net.Mime.MediaTypeNames;
+using Font = System.Drawing.Font;
 
 namespace organizadorCapitulos
 {
@@ -42,12 +45,17 @@ namespace organizadorCapitulos
             label1 = new Label();
             txtTitulo = new TextBox();
             errorProvider = new ErrorProvider(components);
+            panel3 = new Panel();
+            btnUndo = new Button();
+            btnRedo = new Button();
+            lblStatus = new Label();
             tableLayoutPanel1.SuspendLayout();
             panel1.SuspendLayout();
             groupBoxOpciones.SuspendLayout();
             panel2.SuspendLayout();
             groupBoxDetalles.SuspendLayout();
             ((ISupportInitialize)errorProvider).BeginInit();
+            panel3.SuspendLayout();
             SuspendLayout();
             // 
             // listViewSeries
@@ -62,7 +70,7 @@ namespace organizadorCapitulos
             listViewSeries.Location = new Point(10, 70);
             listViewSeries.Margin = new Padding(10);
             listViewSeries.Name = "listViewSeries";
-            listViewSeries.Size = new Size(1588, 638);
+            listViewSeries.Size = new Size(1588, 598);
             listViewSeries.TabIndex = 0;
             listViewSeries.UseCompatibleStateImageBehavior = false;
             listViewSeries.View = View.Details;
@@ -123,13 +131,15 @@ namespace organizadorCapitulos
             tableLayoutPanel1.Controls.Add(panel1, 0, 0);
             tableLayoutPanel1.Controls.Add(listViewSeries, 0, 1);
             tableLayoutPanel1.Controls.Add(panel2, 0, 2);
+            tableLayoutPanel1.Controls.Add(panel3, 0, 3);
             tableLayoutPanel1.Dock = DockStyle.Fill;
             tableLayoutPanel1.Location = new Point(0, 0);
             tableLayoutPanel1.Name = "tableLayoutPanel1";
-            tableLayoutPanel1.RowCount = 3;
+            tableLayoutPanel1.RowCount = 4;
             tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Absolute, 60F));
             tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
             tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Absolute, 150F));
+            tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Absolute, 40F));
             tableLayoutPanel1.Size = new Size(1608, 868);
             tableLayoutPanel1.TabIndex = 3;
             // 
@@ -168,6 +178,7 @@ namespace organizadorCapitulos
             radioCambiar.TabIndex = 4;
             radioCambiar.Text = "Cambiar estructura";
             radioCambiar.UseVisualStyleBackColor = true;
+            radioCambiar.CheckedChanged += radioCambiar_CheckedChanged;
             // 
             // radioMantener
             // 
@@ -180,13 +191,14 @@ namespace organizadorCapitulos
             radioMantener.TabStop = true;
             radioMantener.Text = "Mantener estructura";
             radioMantener.UseVisualStyleBackColor = true;
+            radioMantener.CheckedChanged += radioMantener_CheckedChanged;
             // 
             // panel2
             // 
             panel2.BackColor = Color.White;
             panel2.Controls.Add(groupBoxDetalles);
             panel2.Dock = DockStyle.Fill;
-            panel2.Location = new Point(10, 728);
+            panel2.Location = new Point(10, 678);
             panel2.Margin = new Padding(10);
             panel2.Name = "panel2";
             panel2.Size = new Size(1588, 130);
@@ -286,11 +298,69 @@ namespace organizadorCapitulos
             txtTitulo.Name = "txtTitulo";
             txtTitulo.Size = new Size(1480, 25);
             txtTitulo.TabIndex = 0;
+            txtTitulo.KeyDown += onClickEnter;
             txtTitulo.Validating += txtTitulo_Validating;
             // 
             // errorProvider
             // 
             errorProvider.ContainerControl = this;
+            // 
+            // panel3
+            // 
+            panel3.BackColor = Color.WhiteSmoke;
+            panel3.Controls.Add(btnUndo);
+            panel3.Controls.Add(btnRedo);
+            panel3.Controls.Add(lblStatus);
+            panel3.Dock = DockStyle.Fill;
+            panel3.Location = new Point(3, 821);
+            panel3.Name = "panel3";
+            panel3.Size = new Size(1602, 34);
+            panel3.TabIndex = 5;
+            // 
+            // btnUndo
+            // 
+            btnUndo.Anchor = AnchorStyles.Right;
+            btnUndo.BackColor = Color.Gray;
+            btnUndo.Enabled = false;
+            btnUndo.FlatAppearance.BorderSize = 0;
+            btnUndo.FlatStyle = FlatStyle.Flat;
+            btnUndo.Font = new Font("Segoe UI", 8.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            btnUndo.ForeColor = Color.White;
+            btnUndo.Location = new Point(1320, 5);
+            btnUndo.Name = "btnUndo";
+            btnUndo.Size = new Size(80, 25);
+            btnUndo.TabIndex = 2;
+            btnUndo.Text = "Deshacer";
+            btnUndo.UseVisualStyleBackColor = false;
+            btnUndo.Click += btnUndo_Click;
+            // 
+            // btnRedo
+            // 
+            btnRedo.Anchor = AnchorStyles.Right;
+            btnRedo.BackColor = Color.Gray;
+            btnRedo.Enabled = false;
+            btnRedo.FlatAppearance.BorderSize = 0;
+            btnRedo.FlatStyle = FlatStyle.Flat;
+            btnRedo.Font = new Font("Segoe UI", 8.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            btnRedo.ForeColor = Color.White;
+            btnRedo.Location = new Point(1410, 5);
+            btnRedo.Name = "btnRedo";
+            btnRedo.Size = new Size(80, 25);
+            btnRedo.TabIndex = 1;
+            btnRedo.Text = "Rehacer";
+            btnRedo.UseVisualStyleBackColor = false;
+            btnRedo.Click += btnRedo_Click;
+            // 
+            // lblStatus
+            // 
+            lblStatus.Anchor = AnchorStyles.Left;
+            lblStatus.AutoSize = true;
+            lblStatus.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            lblStatus.Location = new Point(10, 10);
+            lblStatus.Name = "lblStatus";
+            lblStatus.Size = new Size(120, 15);
+            lblStatus.TabIndex = 0;
+            lblStatus.Text = "Listo para trabajar...";
             // 
             // MainForm
             // 
@@ -311,6 +381,8 @@ namespace organizadorCapitulos
             groupBoxDetalles.ResumeLayout(false);
             groupBoxDetalles.PerformLayout();
             ((ISupportInitialize)errorProvider).EndInit();
+            panel3.ResumeLayout(false);
+            panel3.PerformLayout();
             ResumeLayout(false);
         }
 
@@ -334,5 +406,9 @@ namespace organizadorCapitulos
         private GroupBox groupBoxOpciones;
         private GroupBox groupBoxDetalles;
         private ErrorProvider errorProvider;
+        private Panel panel3;
+        private Label lblStatus;
+        private Button btnRedo;
+        private Button btnUndo;
     }
 }
