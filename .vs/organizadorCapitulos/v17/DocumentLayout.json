@@ -1,0 +1,117 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\carlo\\source\\repos\\organizadorCapitulos\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{33426FF2-0C4E-4EA6-A8F0-EE356134E148}|organizadorCapitulos\\organizadorCapitulos.csproj|c:\\users\\carlo\\source\\repos\\organizadorcapitulos\\organizadorcapitulos\\application\\strategies\\renamestrategyfactory.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{33426FF2-0C4E-4EA6-A8F0-EE356134E148}|organizadorCapitulos\\organizadorCapitulos.csproj|solutionrelative:organizadorcapitulos\\application\\strategies\\renamestrategyfactory.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{33426FF2-0C4E-4EA6-A8F0-EE356134E148}|organizadorCapitulos\\organizadorCapitulos.csproj|c:\\users\\carlo\\source\\repos\\organizadorcapitulos\\organizadorcapitulos\\application\\strategies\\changestrategy.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{33426FF2-0C4E-4EA6-A8F0-EE356134E148}|organizadorCapitulos\\organizadorCapitulos.csproj|solutionrelative:organizadorcapitulos\\application\\strategies\\changestrategy.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{33426FF2-0C4E-4EA6-A8F0-EE356134E148}|organizadorCapitulos\\organizadorCapitulos.csproj|c:\\users\\carlo\\source\\repos\\organizadorcapitulos\\organizadorcapitulos\\application\\strategies\\maintainstrategy.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{33426FF2-0C4E-4EA6-A8F0-EE356134E148}|organizadorCapitulos\\organizadorCapitulos.csproj|solutionrelative:organizadorcapitulos\\application\\strategies\\maintainstrategy.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{33426FF2-0C4E-4EA6-A8F0-EE356134E148}|organizadorCapitulos\\organizadorCapitulos.csproj|c:\\users\\carlo\\source\\repos\\organizadorcapitulos\\organizadorcapitulos\\core\\interfaces\\strategies\\irenamestrategy.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{33426FF2-0C4E-4EA6-A8F0-EE356134E148}|organizadorCapitulos\\organizadorCapitulos.csproj|solutionrelative:organizadorcapitulos\\core\\interfaces\\strategies\\irenamestrategy.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{33426FF2-0C4E-4EA6-A8F0-EE356134E148}|organizadorCapitulos\\organizadorCapitulos.csproj|c:\\users\\carlo\\source\\repos\\organizadorcapitulos\\organizadorcapitulos\\ui\\forms\\mainform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{33426FF2-0C4E-4EA6-A8F0-EE356134E148}|organizadorCapitulos\\organizadorCapitulos.csproj|solutionrelative:organizadorcapitulos\\ui\\forms\\mainform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{33426FF2-0C4E-4EA6-A8F0-EE356134E148}|organizadorCapitulos\\organizadorCapitulos.csproj|c:\\users\\carlo\\source\\repos\\organizadorcapitulos\\organizadorcapitulos\\application\\commands\\renamefilecommand.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{33426FF2-0C4E-4EA6-A8F0-EE356134E148}|organizadorCapitulos\\organizadorCapitulos.csproj|solutionrelative:organizadorcapitulos\\application\\commands\\renamefilecommand.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "RenameStrategyFactory.cs",
+              "DocumentMoniker": "C:\\Users\\carlo\\source\\repos\\organizadorCapitulos\\organizadorCapitulos\\Application\\Strategies\\RenameStrategyFactory.cs",
+              "RelativeDocumentMoniker": "organizadorCapitulos\\Application\\Strategies\\RenameStrategyFactory.cs",
+              "ToolTip": "C:\\Users\\carlo\\source\\repos\\organizadorCapitulos\\organizadorCapitulos\\Application\\Strategies\\RenameStrategyFactory.cs",
+              "RelativeToolTip": "organizadorCapitulos\\Application\\Strategies\\RenameStrategyFactory.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAANAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-21T13:10:53.319Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "ChangeStrategy.cs",
+              "DocumentMoniker": "C:\\Users\\carlo\\source\\repos\\organizadorCapitulos\\organizadorCapitulos\\Application\\Strategies\\ChangeStrategy.cs",
+              "RelativeDocumentMoniker": "organizadorCapitulos\\Application\\Strategies\\ChangeStrategy.cs",
+              "ToolTip": "C:\\Users\\carlo\\source\\repos\\organizadorCapitulos\\organizadorCapitulos\\Application\\Strategies\\ChangeStrategy.cs",
+              "RelativeToolTip": "organizadorCapitulos\\Application\\Strategies\\ChangeStrategy.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABgAAAAwAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-21T13:10:27.162Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "MaintainStrategy.cs",
+              "DocumentMoniker": "C:\\Users\\carlo\\source\\repos\\organizadorCapitulos\\organizadorCapitulos\\Application\\Strategies\\MaintainStrategy.cs",
+              "RelativeDocumentMoniker": "organizadorCapitulos\\Application\\Strategies\\MaintainStrategy.cs",
+              "ToolTip": "C:\\Users\\carlo\\source\\repos\\organizadorCapitulos\\organizadorCapitulos\\Application\\Strategies\\MaintainStrategy.cs",
+              "RelativeToolTip": "organizadorCapitulos\\Application\\Strategies\\MaintainStrategy.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABcAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-21T13:10:01.749Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "IRenameStrategy.cs",
+              "DocumentMoniker": "C:\\Users\\carlo\\source\\repos\\organizadorCapitulos\\organizadorCapitulos\\Core\\Interfaces\\Strategies\\IRenameStrategy.cs",
+              "RelativeDocumentMoniker": "organizadorCapitulos\\Core\\Interfaces\\Strategies\\IRenameStrategy.cs",
+              "ToolTip": "C:\\Users\\carlo\\source\\repos\\organizadorCapitulos\\organizadorCapitulos\\Core\\Interfaces\\Strategies\\IRenameStrategy.cs",
+              "RelativeToolTip": "organizadorCapitulos\\Core\\Interfaces\\Strategies\\IRenameStrategy.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAAHAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-21T13:03:46.126Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "RenameFileCommand.cs",
+              "DocumentMoniker": "C:\\Users\\carlo\\source\\repos\\organizadorCapitulos\\organizadorCapitulos\\Application\\Commands\\RenameFileCommand.cs",
+              "RelativeDocumentMoniker": "organizadorCapitulos\\Application\\Commands\\RenameFileCommand.cs",
+              "ToolTip": "C:\\Users\\carlo\\source\\repos\\organizadorCapitulos\\organizadorCapitulos\\Application\\Commands\\RenameFileCommand.cs",
+              "RelativeToolTip": "organizadorCapitulos\\Application\\Commands\\RenameFileCommand.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAC8AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-21T12:59:25.703Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "MainForm.cs",
+              "DocumentMoniker": "C:\\Users\\carlo\\source\\repos\\organizadorCapitulos\\organizadorCapitulos\\UI\\Forms\\MainForm.cs",
+              "RelativeDocumentMoniker": "organizadorCapitulos\\UI\\Forms\\MainForm.cs",
+              "ToolTip": "C:\\Users\\carlo\\source\\repos\\organizadorCapitulos\\organizadorCapitulos\\UI\\Forms\\MainForm.cs",
+              "RelativeToolTip": "organizadorCapitulos\\UI\\Forms\\MainForm.cs",
+              "ViewState": "AgIAAMAAAAAAAAAAAAAAAAYBAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-21T12:50:45.318Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
