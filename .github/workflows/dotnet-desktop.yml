@@ -1,5 +1,3 @@
-# This workflow will build, test and publish a .NET Core Desktop application
-
 name: .NET Core Desktop
 
 on:
@@ -7,6 +5,7 @@ on:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
+  workflow_dispatch:
 
 jobs:
 
@@ -20,7 +19,6 @@ jobs:
 
     env:
       Solution_Name: organizadorCapitulos.sln
-      Test_Project_Path: organizadorCapitulos.Tests\organizadorCapitulos.Tests.csproj
       Main_Project_Path: organizadorCapitulos\organizadorCapitulos.csproj
 
     steps:
@@ -57,7 +55,7 @@ jobs:
 
     # Publish the application
     - name: Publish the application
-      run: dotnet publish $env:Main_Project_Path --configuration $env:Configuration --output ./publish/$env:Configuration
+      run: dotnet publish $env:Main_Project_Path --configuration $env:Configuration --no-restore --output ./publish/$env:Configuration
       env:
         Configuration: ${{ matrix.configuration }}
 
