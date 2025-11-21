@@ -96,5 +96,63 @@ namespace organizadorCapitulos
             this.DialogResult = DialogResult.Cancel;
             this.Close();
         }
+
+        private void treeViewFolders_AfterCheck(object sender, TreeViewEventArgs e)
+        {
+            // Actualizar el contador de carpetas seleccionadas
+            int selectedCount = CountCheckedNodes(treeViewFolders.Nodes);
+            lblStatus.Text = $"{selectedCount} carpetas seleccionadas";
+        }
+
+        private int CountCheckedNodes(TreeNodeCollection nodes)
+        {
+            int count = 0;
+            foreach (TreeNode node in nodes)
+            {
+                if (node.Checked)
+                    count++;
+                count += CountCheckedNodes(node.Nodes);
+            }
+            return count;
+        }
+
+        private void btnExpandAll_Click(object sender, EventArgs e)
+        {
+            treeViewFolders.BeginUpdate();
+            try
+            {
+                ExpandAllNodes(treeViewFolders.Nodes, true);
+            }
+            finally
+            {
+                treeViewFolders.EndUpdate();
+            }
+        }
+
+        private void btnCollapseAll_Click(object sender, EventArgs e)
+        {
+            treeViewFolders.BeginUpdate();
+            try
+            {
+                ExpandAllNodes(treeViewFolders.Nodes, false);
+            }
+            finally
+            {
+                treeViewFolders.EndUpdate();
+            }
+        }
+
+        private void ExpandAllNodes(TreeNodeCollection nodes, bool expand)
+        {
+            foreach (TreeNode node in nodes)
+            {
+                node.Expand();
+                if (expand)
+                    node.ExpandAll();
+                else
+                    node.Collapse();
+                ExpandAllNodes(node.Nodes, expand);
+            }
+        }
     }
 }

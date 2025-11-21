@@ -83,6 +83,19 @@ namespace organizadorCapitulos
 
         private void btnGuardar_Click(object sender, EventArgs e)
         {
+            renombrarCapitulo();
+        }
+
+        private void onClickEnter(object sender, KeyEventArgs a)
+        {
+            if(a.KeyCode == Keys.Enter)
+            {
+                renombrarCapitulo();
+            }
+        }
+
+        private void renombrarCapitulo()
+        {
             if (listViewSeries.SelectedItems.Count == 0)
             {
                 MessageBox.Show("Por favor seleccione un archivo.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -92,7 +105,9 @@ namespace organizadorCapitulos
             if (!ValidateChildren(ValidationConstraints.Enabled))
                 return;
 
+            // Guardamos la referencia al item seleccionado antes de cualquier operación
             ListViewItem selectedItem = listViewSeries.SelectedItems[0];
+            int currentIndex = selectedItem.Index;
             string originalFilePath = selectedItem.SubItems[1].Text;
             string originalFileExtension = Path.GetExtension(originalFilePath);
             string directory = Path.GetDirectoryName(originalFilePath);
@@ -113,12 +128,32 @@ namespace organizadorCapitulos
 
                 File.Move(originalFilePath, nuevoFilePath);
 
+                // Actualizamos el ListViewItem
                 selectedItem.Text = nuevoNombre;
                 selectedItem.SubItems[1].Text = nuevoFilePath;
 
                 if (radioMantener.Checked)
                 {
                     IncrementarCapitulo();
+                }
+
+                // Limpiamos la selección actual
+                listViewSeries.SelectedItems.Clear();
+
+                // Seleccionamos el siguiente item si existe
+                if (currentIndex < listViewSeries.Items.Count - 1)
+                {
+                    ListViewItem nextItem = listViewSeries.Items[currentIndex + 1];
+                    nextItem.Selected = true;
+                    nextItem.Focused = true;
+                    listViewSeries.EnsureVisible(currentIndex + 1);
+
+                    // Si estamos en modo "Cambiar", actualizamos el título con el nuevo archivo
+                    if (radioCambiar.Checked)
+                    {
+                        string nextFileName = Path.GetFileNameWithoutExtension(nextItem.Text);
+                        txtTitulo.Text = nextFileName;
+                    }
                 }
 
                 MessageBox.Show("Archivo renombrado exitosamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -144,11 +179,14 @@ namespace organizadorCapitulos
                 MessageBox.Show("No hay archivos para guardar.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
-
+            string carpeta_guardar;
             if (!Directory.Exists(ruta_carpeta))
             {
                 Directory.CreateDirectory(ruta_carpeta);
             }
+
+            carpeta_guardar = SeleccionarCarpeta();
+            
 
             using (ProgressForm progressForm = new ProgressForm())
             {
@@ -161,7 +199,7 @@ namespace organizadorCapitulos
                 {
                     string originalFilePath = item.SubItems[1].Text;
                     string fileName = Path.GetFileName(originalFilePath);
-                    string destinoPath = Path.Combine(ruta_carpeta, fileName);
+                    string destinoPath = Path.Combine(carpeta_guardar, fileName);
 
                     try
                     {
@@ -173,7 +211,9 @@ namespace organizadorCapitulos
                             File.Delete(destinoPath);
                         }
 
-                        await CopyLargeFileAsync(originalFilePath, destinoPath);
+                        //    await CopyLargeFileAsync(originalFilePath, destinoPath);
+
+                        File.Move(originalFilePath, destinoPath);
                     }
                     catch (Exception ex)
                     {
@@ -185,6 +225,25 @@ namespace organizadorCapitulos
             }
 
             MessageBox.Show("Todos los archivos fueron copiados exitosamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        public string SeleccionarCarpeta()
+        {
+            using (var folderDialog = new FolderBrowserDialog())
+            {
+                folderDialog.Description = "Selecciona una carpeta";
+                folderDialog.RootFolder = Environment.SpecialFolder.MyComputer;
+                folderDialog.ShowNewFolderButton = true;
+
+                DialogResult result = folderDialog.ShowDialog();
+
+                if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(folderDialog.SelectedPath))
+                {
+                    return folderDialog.SelectedPath;
+                }
+            }
+
+            return null;
         }
 
         private async void btnCargarCarpetas_Click(object sender, EventArgs e)
@@ -350,5 +409,8 @@ namespace organizadorCapitulos
 
             return order == SortOrder.Ascending ? returnVal : -returnVal;
         }
+
+
+        
     }
 }

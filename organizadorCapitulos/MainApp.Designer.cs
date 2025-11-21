@@ -20,8 +20,8 @@ namespace organizadorCapitulos
 
         private void InitializeComponent()
         {
-            components = new System.ComponentModel.Container();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
+            components = new Container();
+            ComponentResourceManager resources = new ComponentResourceManager(typeof(MainForm));
             listViewSeries = new ListView();
             columnHeader1 = new ColumnHeader();
             columnHeader2 = new ColumnHeader();
@@ -47,7 +47,7 @@ namespace organizadorCapitulos
             groupBoxOpciones.SuspendLayout();
             panel2.SuspendLayout();
             groupBoxDetalles.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)errorProvider).BeginInit();
+            ((ISupportInitialize)errorProvider).BeginInit();
             SuspendLayout();
             // 
             // listViewSeries
@@ -56,18 +56,18 @@ namespace organizadorCapitulos
             listViewSeries.BorderStyle = BorderStyle.FixedSingle;
             listViewSeries.Columns.AddRange(new ColumnHeader[] { columnHeader1, columnHeader2 });
             listViewSeries.Dock = DockStyle.Fill;
-            listViewSeries.Font = new Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point);
+            listViewSeries.Font = new Font("Segoe UI", 9.75F);
             listViewSeries.FullRowSelect = true;
             listViewSeries.GridLines = true;
-            listViewSeries.Location = new Point(10, 60);
+            listViewSeries.Location = new Point(10, 70);
             listViewSeries.Margin = new Padding(10);
             listViewSeries.Name = "listViewSeries";
-            listViewSeries.Size = new Size(1588, 647);
+            listViewSeries.Size = new Size(1588, 638);
             listViewSeries.TabIndex = 0;
             listViewSeries.UseCompatibleStateImageBehavior = false;
             listViewSeries.View = View.Details;
-            listViewSeries.SelectedIndexChanged += listViewSeries_SelectedIndexChanged;
             listViewSeries.ColumnClick += listViewSeries_ColumnClick;
+            listViewSeries.SelectedIndexChanged += listViewSeries_SelectedIndexChanged;
             // 
             // columnHeader1
             // 
@@ -85,9 +85,8 @@ namespace organizadorCapitulos
             btnCargarCarpetas.BackColor = Color.SteelBlue;
             btnCargarCarpetas.FlatAppearance.BorderSize = 0;
             btnCargarCarpetas.FlatStyle = FlatStyle.Flat;
-            btnCargarCarpetas.Font = new Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point);
+            btnCargarCarpetas.Font = new Font("Segoe UI", 9.75F);
             btnCargarCarpetas.ForeColor = Color.White;
-            btnCargarCarpetas.Image = (Image)resources.GetObject("btnCargarCarpetas.Image");
             btnCargarCarpetas.ImageAlign = ContentAlignment.MiddleLeft;
             btnCargarCarpetas.Location = new Point(10, 12);
             btnCargarCarpetas.Name = "btnCargarCarpetas";
@@ -104,9 +103,8 @@ namespace organizadorCapitulos
             btnGuardarTodo.BackColor = Color.SeaGreen;
             btnGuardarTodo.FlatAppearance.BorderSize = 0;
             btnGuardarTodo.FlatStyle = FlatStyle.Flat;
-            btnGuardarTodo.Font = new Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point);
+            btnGuardarTodo.Font = new Font("Segoe UI", 9.75F);
             btnGuardarTodo.ForeColor = Color.White;
-            btnGuardarTodo.Image = (Image)resources.GetObject("btnGuardarTodo.Image");
             btnGuardarTodo.ImageAlign = ContentAlignment.MiddleLeft;
             btnGuardarTodo.Location = new Point(1442, 12);
             btnGuardarTodo.Name = "btnGuardarTodo";
@@ -153,7 +151,7 @@ namespace organizadorCapitulos
             groupBoxOpciones.Anchor = AnchorStyles.Top;
             groupBoxOpciones.Controls.Add(radioCambiar);
             groupBoxOpciones.Controls.Add(radioMantener);
-            groupBoxOpciones.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+            groupBoxOpciones.Font = new Font("Segoe UI", 9F);
             groupBoxOpciones.Location = new Point(650, 5);
             groupBoxOpciones.Name = "groupBoxOpciones";
             groupBoxOpciones.Size = new Size(300, 50);
@@ -166,7 +164,7 @@ namespace organizadorCapitulos
             radioCambiar.AutoSize = true;
             radioCambiar.Location = new Point(170, 20);
             radioCambiar.Name = "radioCambiar";
-            radioCambiar.Size = new Size(120, 19);
+            radioCambiar.Size = new Size(126, 19);
             radioCambiar.TabIndex = 4;
             radioCambiar.Text = "Cambiar estructura";
             radioCambiar.UseVisualStyleBackColor = true;
@@ -177,7 +175,7 @@ namespace organizadorCapitulos
             radioMantener.Checked = true;
             radioMantener.Location = new Point(20, 20);
             radioMantener.Name = "radioMantener";
-            radioMantener.Size = new Size(130, 19);
+            radioMantener.Size = new Size(132, 19);
             radioMantener.TabIndex = 3;
             radioMantener.TabStop = true;
             radioMantener.Text = "Mantener estructura";
@@ -188,10 +186,10 @@ namespace organizadorCapitulos
             panel2.BackColor = Color.White;
             panel2.Controls.Add(groupBoxDetalles);
             panel2.Dock = DockStyle.Fill;
-            panel2.Location = new Point(10, 718);
+            panel2.Location = new Point(10, 728);
             panel2.Margin = new Padding(10);
             panel2.Name = "panel2";
-            panel2.Size = new Size(1588, 140);
+            panel2.Size = new Size(1588, 130);
             panel2.TabIndex = 4;
             // 
             // groupBoxDetalles
@@ -204,10 +202,10 @@ namespace organizadorCapitulos
             groupBoxDetalles.Controls.Add(label1);
             groupBoxDetalles.Controls.Add(txtTitulo);
             groupBoxDetalles.Dock = DockStyle.Fill;
-            groupBoxDetalles.Font = new Font("Segoe UI", 9.75F, FontStyle.Regular, GraphicsUnit.Point);
+            groupBoxDetalles.Font = new Font("Segoe UI", 9.75F);
             groupBoxDetalles.Location = new Point(0, 0);
             groupBoxDetalles.Name = "groupBoxDetalles";
-            groupBoxDetalles.Size = new Size(1588, 140);
+            groupBoxDetalles.Size = new Size(1588, 130);
             groupBoxDetalles.TabIndex = 7;
             groupBoxDetalles.TabStop = false;
             groupBoxDetalles.Text = "Detalles del capítulo seleccionado";
@@ -219,7 +217,6 @@ namespace organizadorCapitulos
             btnGuardar.FlatAppearance.BorderSize = 0;
             btnGuardar.FlatStyle = FlatStyle.Flat;
             btnGuardar.ForeColor = Color.White;
-            btnGuardar.Image = (Image)resources.GetObject("btnGuardar.Image");
             btnGuardar.ImageAlign = ContentAlignment.MiddleLeft;
             btnGuardar.Location = new Point(1420, 80);
             btnGuardar.Name = "btnGuardar";
@@ -247,7 +244,7 @@ namespace organizadorCapitulos
             label3.AutoSize = true;
             label3.Location = new Point(180, 88);
             label3.Name = "label3";
-            label3.Size = new Size(60, 17);
+            label3.Size = new Size(59, 17);
             label3.TabIndex = 4;
             label3.Text = "Capítulo:";
             // 
@@ -268,7 +265,7 @@ namespace organizadorCapitulos
             label2.AutoSize = true;
             label2.Location = new Point(20, 88);
             label2.Name = "label2";
-            label2.Size = new Size(80, 17);
+            label2.Size = new Size(78, 17);
             label2.TabIndex = 2;
             label2.Text = "Temporada:";
             // 
@@ -277,7 +274,7 @@ namespace organizadorCapitulos
             label1.AutoSize = true;
             label1.Location = new Point(20, 40);
             label1.Name = "label1";
-            label1.Size = new Size(45, 17);
+            label1.Size = new Size(43, 17);
             label1.TabIndex = 1;
             label1.Text = "Título:";
             // 
@@ -313,7 +310,7 @@ namespace organizadorCapitulos
             panel2.ResumeLayout(false);
             groupBoxDetalles.ResumeLayout(false);
             groupBoxDetalles.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)errorProvider).EndInit();
+            ((ISupportInitialize)errorProvider).EndInit();
             ResumeLayout(false);
         }
 
