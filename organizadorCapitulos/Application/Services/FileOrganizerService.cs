@@ -1,30 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using organizadorCapitulos.Core.Entities;
+﻿using organizadorCapitulos.Core.Entities;
 using organizadorCapitulos.Core.Interfaces.Observers;
 using organizadorCapitulos.Core.Interfaces.Repositories;
 using organizadorCapitulos.Core.Interfaces.Strategies;
 
 namespace organizadorCapitulos.Application.Services
 {
-    public class FileOrganizerService
+    public class FileOrganizerService(IFileRepository fileRepository, IProgressObserver progressObserver)
     {
-        private readonly IFileRepository _fileRepository;
-        private readonly IProgressObserver _progressObserver;
-
-        public FileOrganizerService(IFileRepository fileRepository, IProgressObserver progressObserver)
-        {
-            _fileRepository = fileRepository;
-            _progressObserver = progressObserver;
-        }
-
         public async Task<List<string>> LoadVideoFilesAsync(IEnumerable<string> folders)
         {
-            _progressObserver?.UpdateStatus("Buscando archivos de video...");
-            return new List<string>(await _fileRepository.GetVideoFilesAsync(folders));
+            progressObserver?.UpdateStatus("Buscando archivos de video...");
+            return [.. await fileRepository.GetVideoFilesAsync(folders)];
         }
 
         public async Task<string> RenameFileAsync(string sourcePath, ChapterInfo chapterInfo, IRenameStrategy strategy)
@@ -34,18 +20,18 @@ namespace organizadorCapitulos.Application.Services
                 throw new ArgumentException("La información del capítulo no es válida");
             }
 
-            string extension = System.IO.Path.GetExtension(sourcePath);
+            string extension = Path.GetExtension(sourcePath);
             string newFileName = chapterInfo.GenerateFileName(extension);
-            string? directory = System.IO.Path.GetDirectoryName(sourcePath);
+            string? directory = Path.GetDirectoryName(sourcePath);
             if (string.IsNullOrEmpty(directory)) throw new InvalidOperationException("No se pudo obtener el directorio del archivo.");
-            string destinationPath = System.IO.Path.Combine(directory, newFileName);
+            string destinationPath = Path.Combine(directory, newFileName);
 
-            if (_fileRepository.FileExists(destinationPath))
+            if (fileRepository.FileExists(destinationPath))
             {
                 throw new InvalidOperationException($"Ya existe un archivo con el nombre: {newFileName}");
             }
 
-            await _fileRepository.MoveFileAsync(sourcePath, destinationPath);
+            await fileRepository.MoveFileAsync(sourcePath, destinationPath);
             strategy.UpdateAfterRename(chapterInfo);
 
             return destinationPath;
@@ -53,11 +39,11 @@ namespace organizadorCapitulos.Application.Services
 
         public async Task MoveFilesAsync(List<string> sourcePaths, string destinationFolder)
         {
-            _progressObserver?.UpdateStatus("Moviendo archivos...");
+            progressObserver?.UpdateStatus("Moviendo archivos...");
 
-            if (!System.IO.Directory.Exists(destinationFolder))
+            if (!Directory.Exists(destinationFolder))
             {
-                System.IO.Directory.CreateDirectory(destinationFolder);
+                Directory.CreateDirectory(destinationFolder);
             }
 
             int totalFiles = sourcePaths.Count;
@@ -66,17 +52,17 @@ namespace organizadorCapitulos.Application.Services
             foreach (string sourcePath in sourcePaths)
             {
                 processedFiles++;
-                string fileName = System.IO.Path.GetFileName(sourcePath);
-                string destinationPath = System.IO.Path.Combine(destinationFolder, fileName);
+                string fileName = Path.GetFileName(sourcePath);
+                string destinationPath = Path.Combine(destinationFolder, fileName);
 
-                _progressObserver?.UpdateProgress(processedFiles, totalFiles, fileName);
+                progressObserver?.UpdateProgress(processedFiles, totalFiles, fileName);
 
-                if (_fileRepository.FileExists(destinationPath))
+                if (fileRepository.FileExists(destinationPath))
                 {
-                    _fileRepository.DeleteFile(destinationPath);
+                    fileRepository.DeleteFile(destinationPath);
                 }
 
-                await _fileRepository.MoveFileAsync(sourcePath, destinationPath);
+                await fileRepository.MoveFileAsync(sourcePath, destinationPath);
             }
         }
     }

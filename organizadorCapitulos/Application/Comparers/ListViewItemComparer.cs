@@ -7,25 +7,16 @@ using System.Threading.Tasks;
 
 namespace organizadorCapitulos.Application.Comparers
 {
-    public class ListViewItemComparer : IComparer
+    public class ListViewItemComparer(int column, SortOrder sortOrder) : IComparer
     {
-        private readonly int _column;
-        private readonly SortOrder _order;
-
-        public ListViewItemComparer(int column, SortOrder sortOrder)
-        {
-            _column = column;
-            _order = sortOrder;
-        }
-
         public int Compare(object? x, object? y)
         {
             if (x == null || y == null) return 0;
             int returnVal = string.Compare(
-                ((ListViewItem)x).SubItems[_column].Text,
-                ((ListViewItem)y).SubItems[_column].Text);
+                ((ListViewItem)x).SubItems[column].Text,
+                ((ListViewItem)y).SubItems[column].Text);
 
-            return _order == SortOrder.Ascending ? returnVal : -returnVal;
+            return sortOrder == SortOrder.Ascending ? returnVal : -returnVal;
         }
     }
 }

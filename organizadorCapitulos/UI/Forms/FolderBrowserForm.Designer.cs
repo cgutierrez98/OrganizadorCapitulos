@@ -44,7 +44,7 @@
             treeViewFolders.Name = "treeViewFolders";
             treeViewFolders.Size = new Size(1197, 778);
             treeViewFolders.TabIndex = 0;
-            treeViewFolders.AfterCheck += treeViewFolders_AfterCheck;
+            treeViewFolders.AfterCheck += TreeViewFolders_AfterCheck;
             treeViewFolders.BeforeExpand += treeViewFolders_BeforeExpand;
             // 
             // btnAceptar

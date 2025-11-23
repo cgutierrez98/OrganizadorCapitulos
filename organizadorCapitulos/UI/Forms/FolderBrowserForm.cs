@@ -7,7 +7,8 @@ namespace organizadorCapitulos
 {
     public partial class FolderBrowserForm : Form
     {
-        public List<string> SelectedFolders { get; private set; } = new List<string>();
+        public List<string> SelectedFolders { get; private set; } = [];
+        [System.ComponentModel.DesignerSerializationVisibility(System.ComponentModel.DesignerSerializationVisibility.Hidden)]
         public bool IsSingleSelectionMode { get; set; } = false;
 
         public FolderBrowserForm()
@@ -26,14 +27,14 @@ namespace organizadorCapitulos
             {
                 if (drive.IsReady)
                 {
-                    TreeNode driveNode = new TreeNode(drive.Name) { Tag = drive.Name };
+                    TreeNode driveNode = new(drive.Name) { Tag = drive.Name };
                     treeViewFolders.Nodes.Add(driveNode);
                     LoadSubdirectories(driveNode);
                 }
             }
         }
 
-        private void LoadSubdirectories(TreeNode parentNode)
+        private static void LoadSubdirectories(TreeNode parentNode)
         {
             try
             {
@@ -43,11 +44,11 @@ namespace organizadorCapitulos
                 parentNode.Nodes.Clear();
                 foreach (string directory in Directory.GetDirectories(path))
                 {
-                    TreeNode dirNode = new TreeNode(Path.GetFileName(directory)) { Tag = directory };
+                    TreeNode dirNode = new(Path.GetFileName(directory)) { Tag = directory };
                     parentNode.Nodes.Add(dirNode);
 
                     // Agregar nodo ficticio para mostrar el signo +
-                    dirNode.Nodes.Add(new TreeNode("..."));
+                    _ = dirNode.Nodes.Add(new TreeNode("..."));
                 }
             }
             catch (UnauthorizedAccessException)
@@ -60,10 +61,10 @@ namespace organizadorCapitulos
             }
         }
 
-        private void treeViewFolders_AfterCheck(object? sender, TreeViewEventArgs e)
+        private void TreeViewFolders_AfterCheck(object? sender, TreeViewEventArgs e)
         {
             // Evitar reentrancia si estamos modificando programáticamente
-            treeViewFolders.AfterCheck -= treeViewFolders_AfterCheck;
+            treeViewFolders.AfterCheck -= TreeViewFolders_AfterCheck;
 
             try
             {
@@ -97,7 +98,7 @@ namespace organizadorCapitulos
             }
             finally
             {
-                treeViewFolders.AfterCheck += treeViewFolders_AfterCheck;
+                treeViewFolders.AfterCheck += TreeViewFolders_AfterCheck;
             }
         }
 

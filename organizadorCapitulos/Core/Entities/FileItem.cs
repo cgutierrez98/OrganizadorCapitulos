@@ -6,16 +6,10 @@ using System.Threading.Tasks;
 
 namespace organizadorCapitulos.Core.Entities
 {
-    public class FileItem
+    public class FileItem(string fileName, string fullPath)
     {
-        public string FileName { get; set; } = string.Empty;
-        public string FullPath { get; set; } = string.Empty;
+        public string FileName { get; set; } = fileName;
+        public string FullPath { get; set; } = fullPath;
         public bool IsSelected { get; set; }
-
-        public FileItem(string fileName, string fullPath)
-        {
-            FileName = fileName;
-            FullPath = fullPath;
-        }
     }
 }
