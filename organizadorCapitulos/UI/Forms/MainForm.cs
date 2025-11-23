@@ -13,12 +13,15 @@ using organizadorCapitulos.Core.Entities;
 using organizadorCapitulos.Core.Enums;
 using organizadorCapitulos.Core.Interfaces.Observers;
 using organizadorCapitulos.Core.Interfaces.Repositories;
+using organizadorCapitulos.Core.Interfaces.Services;
 using organizadorCapitulos.Core.Interfaces.Strategies;
 using organizadorCapitulos.Infrastructure.Repositories;
+using organizadorCapitulos.Infrastructure.Services;
+using organizadorCapitulos.UI.Forms;
 using SortOrder = System.Windows.Forms.SortOrder;
 
 
-namespace organizadorCapitulos
+namespace organizadorCapitulos.UI.Forms
 {
     public partial class MainForm : Form, IProgressObserver
     {
@@ -27,6 +30,7 @@ namespace organizadorCapitulos
         private readonly RenameStrategyFactory _strategyFactory;
         private readonly CommandManager _commandManager;
         private readonly ProgressNotifier _progressNotifier;
+        private readonly IMetadataService _metadataService;
 
         private IRenameStrategy _currentStrategy;
         private SortOrder _lastSortOrder = SortOrder.None;
@@ -42,6 +46,7 @@ namespace organizadorCapitulos
             _fileOrganizerService = new FileOrganizerService(_fileRepository, this);
             _strategyFactory = new RenameStrategyFactory();
             _commandManager = new CommandManager();
+            _metadataService = new TmdbMetadataService();
 
             _progressNotifier.Subscribe(this);
             _currentStrategy = _strategyFactory.CreateStrategy(RenameMode.Maintain);
@@ -56,6 +61,7 @@ namespace organizadorCapitulos
             txtTemporada.Validating += txtTemporada_Validating;
             txtCapitulo.Validating += txtCapitulo_Validating;
             txtTitulo.Validating += txtTitulo_Validating;
+            txtTituloEpisodio.Validating += txtTituloEpisodio_Validating;
         }
 
         private void UpdateUIState()
@@ -84,11 +90,20 @@ namespace organizadorCapitulos
         {
             if (listViewSeries.SelectedItems.Count > 0)
             {
-                if (radioCambiar.Checked)
+                var selectedItem = listViewSeries.SelectedItems[0];
+
+                // Mostrar título del episodio si está disponible en Tag
+                if (selectedItem.Tag is string episodeTitle && !string.IsNullOrWhiteSpace(episodeTitle))
                 {
-                    string fileName = listViewSeries.SelectedItems[0].Text;
-                    string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(fileName);
-                    txtTitulo.Text = fileNameWithoutExtension;
+                    txtTituloEpisodio.Text = episodeTitle;
+                    txtTituloEpisodio.ReadOnly = true;
+                    txtTituloEpisodio.BackColor = Color.FromArgb(243, 244, 246); // Gris claro
+                }
+                else
+                {
+                    txtTituloEpisodio.Text = string.Empty;
+                    txtTituloEpisodio.ReadOnly = false;
+                    txtTituloEpisodio.BackColor = Color.White;
                 }
             }
             UpdateUIState();
@@ -181,6 +196,122 @@ namespace organizadorCapitulos
                 MessageBox.Show($"Error al rehacer: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
+        private void btnSettings_Click(object sender, EventArgs e)
+        {
+            // We'll use a property or method to get/set the key. For now let's assume we pass empty string if not set.
+            // In a real app we would store this in Properties.Settings.Default
+            string currentKey = _metadataService.IsConfigured() ? "********" : "";
+
+            using (var settingsForm = new SettingsForm(currentKey))
+            {
+                if (settingsForm.ShowDialog(this) == DialogResult.OK)
+                {
+                    _metadataService.Configure(settingsForm.ApiKey);
+                    UpdateStatus("Configuración actualizada.");
+                }
+            }
+        }
+
+        private async void btnMetadata_Click(object sender, EventArgs e)
+        {
+            if (!_metadataService.IsConfigured())
+            {
+                MessageBox.Show("Por favor configura la API Key de TMDB primero.", "Configuración requerida", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                btnSettings_Click(sender, e);
+                if (!_metadataService.IsConfigured()) return;
+            }
+
+            if (listViewSeries.Items.Count == 0)
+            {
+                MessageBox.Show("Carga archivos primero.", "Información", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            // 1. Guess Series Name from the first file (simplified for now)
+            string firstFile = listViewSeries.Items[0].Text;
+            // Simple heuristic: take first part before "S01" or similar, or just ask user
+            string query = Microsoft.VisualBasic.Interaction.InputBox("Ingrese el nombre de la serie para buscar:", "Buscar Serie", Path.GetFileNameWithoutExtension(firstFile));
+
+            if (string.IsNullOrWhiteSpace(query)) return;
+
+            UpdateStatus("Buscando serie...");
+            var results = await _metadataService.SearchSeriesAsync(query);
+
+            if (results.Count == 0)
+            {
+                MessageBox.Show("No se encontraron series.", "Sin resultados", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                UpdateStatus("Búsqueda sin resultados.");
+                return;
+            }
+
+            // 2. Select Series (Take first for now, or implement selection dialog later)
+            var selectedSeries = results[0];
+            txtTitulo.Text = selectedSeries.Name; // Guardar nombre de la serie
+            UpdateStatus($"Serie seleccionada: {selectedSeries.Name} ({selectedSeries.FirstAirDate})");
+
+            // 3. Fetch Episodes
+            using (var progressForm = new ProgressForm())
+            {
+                progressForm.Show();
+                int total = listViewSeries.Items.Count;
+                int current = 0;
+
+                foreach (ListViewItem item in listViewSeries.Items)
+                {
+                    current++;
+                    string filename = item.Text;
+                    progressForm.UpdateProgress(current, total, filename);
+
+                    // Try to parse S and E from filename
+                    // This is a simplified parser, ideally we'd use a regex or the existing logic if exposed
+                    if (TryExtractSeasonEpisode(filename, out int season, out int episode))
+                    {
+                        string title = await _metadataService.GetEpisodeTitleAsync(selectedSeries.Id, season, episode);
+                        if (!string.IsNullOrEmpty(title))
+                        {
+                            // Store the found title in the Tag (for later use)
+                            item.Tag = title;
+
+                            // Ensure there is a third column (SubItems[2]) and set the title there so the user sees it immediately
+                            if (item.SubItems.Count < 3)
+                            {
+                                // Add empty subitems until we have at least 3
+                                while (item.SubItems.Count < 3)
+                                {
+                                    item.SubItems.Add(string.Empty);
+                                }
+                            }
+
+                            item.SubItems[2].Text = title;
+                        }
+                    }
+                }
+
+                // Refresh to make sure UI updates
+                listViewSeries.Refresh();
+            }
+
+            UpdateStatus("Metadatos descargados. Selecciona un archivo para ver el título sugerido.");
+            MessageBox.Show("Búsqueda completada. Los títulos se han guardado en memoria y se muestran en la lista.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private bool TryExtractSeasonEpisode(string filename, out int season, out int episode)
+        {
+            // Simple Regex for SxxExx
+            var match = System.Text.RegularExpressions.Regex.Match(filename, @"S(\d+)E(\d+)", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+            if (match.Success)
+            {
+                season = int.Parse(match.Groups[1].Value);
+                episode = int.Parse(match.Groups[2].Value);
+                return true;
+            }
+
+            season = 0;
+            episode = 0;
+            return false;
+        }
+
         #endregion
 
         #region Business Logic Methods
@@ -211,7 +342,8 @@ namespace organizadorCapitulos
             {
                 Season = temporada,
                 Chapter = capitulo,
-                Title = txtTitulo.Text.Trim()
+                Title = txtTitulo.Text.Trim(),
+                EpisodeTitle = txtTituloEpisodio.Text.Trim()
             };
 
             try
@@ -283,7 +415,7 @@ namespace organizadorCapitulos
 
                 try
                 {
-                    var moveCommand = new MoveFilesCommand(_fileRepository, this, sourcePaths, carpetaDestino);
+                    var moveCommand = new MoveFilesCommand(_fileRepository, progressForm, sourcePaths, carpetaDestino);
                     await _commandManager.ExecuteCommandAsync(moveCommand);
 
                     // Actualizar ListView con nuevas rutas
@@ -308,45 +440,51 @@ namespace organizadorCapitulos
 
         private async Task CargarCarpetasAsync()
         {
-            using (var folderBrowser = new FolderBrowserForm())
             {
-                if (folderBrowser.ShowDialog(this) != DialogResult.OK || folderBrowser.SelectedFolders.Count == 0)
+                using (var folderBrowser = new FolderBrowserForm())
                 {
-                    return;
-                }
-
-                listViewSeries.Items.Clear();
-                UpdateStatus("Cargando archivos de video...");
-
-                using (ProgressForm progressForm = new ProgressForm())
-                {
-                    progressForm.Show();
-
-                    try
+                    if (folderBrowser.ShowDialog(this) != DialogResult.OK || folderBrowser.SelectedFolders.Count == 0)
                     {
-                        var files = await _fileOrganizerService.LoadVideoFilesAsync(folderBrowser.SelectedFolders);
-
-                        int totalFiles = files.Count;
-                        int processedFiles = 0;
-
-                        foreach (string file in files)
-                        {
-                            processedFiles++;
-                            UpdateProgress(processedFiles, totalFiles, Path.GetFileName(file));
-
-                            ListViewItem item = new ListViewItem(Path.GetFileName(file));
-                            item.SubItems.Add(file);
-                            listViewSeries.Items.Add(item);
-                        }
-
-                        UpdateStatus($"Carga completada: {listViewSeries.Items.Count} archivos encontrados");
-                        MessageBox.Show($"Se cargaron {listViewSeries.Items.Count} archivos de video.",
-                            "Carga completada", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        return;
                     }
-                    catch (Exception ex)
+
+                    listViewSeries.Items.Clear();
+                    UpdateStatus("Cargando archivos de video...");
+
+                    using (ProgressForm progressForm = new ProgressForm())
                     {
-                        MessageBox.Show($"Error al cargar archivos: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        UpdateStatus($"Error en carga: {ex.Message}");
+                        progressForm.Show();
+
+                        try
+                        {
+                            var files = await _fileOrganizerService.LoadVideoFilesAsync(folderBrowser.SelectedFolders);
+
+                            int totalFiles = files.Count;
+                            int processedFiles = 0;
+
+                            foreach (string file in files)
+                            {
+                                processedFiles++;
+                                UpdateProgress(processedFiles, totalFiles, Path.GetFileName(file));
+
+                                ListViewItem item = new ListViewItem(Path.GetFileName(file));
+                                item.SubItems.Add(file);
+
+                                // Ensure we have a third (title) column available from the start so later metadata can be placed at SubItems[2]
+                                item.SubItems.Add(string.Empty);
+
+                                listViewSeries.Items.Add(item);
+                            }
+
+                            UpdateStatus($"Carga completada: {listViewSeries.Items.Count} archivos encontrados");
+                            MessageBox.Show($"Se cargaron {listViewSeries.Items.Count} archivos de video.",
+                                "Carga completada", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show($"Error al cargar archivos: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            UpdateStatus($"Error en carga: {ex.Message}");
+                        }
                     }
                 }
             }
@@ -465,17 +603,38 @@ namespace organizadorCapitulos
         {
             if (string.IsNullOrWhiteSpace(txtTitulo.Text))
             {
-                errorProvider.SetError(txtTitulo, "El título no puede estar vacío");
+                errorProvider.SetError(txtTitulo, "El nombre de la serie no puede estar vacío");
                 e.Cancel = true;
             }
             else if (txtTitulo.Text.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0)
             {
-                errorProvider.SetError(txtTitulo, "El título contiene caracteres no válidos para un nombre de archivo");
+                errorProvider.SetError(txtTitulo, "El nombre contiene caracteres no válidos para un nombre de archivo");
                 e.Cancel = true;
             }
             else
             {
                 errorProvider.SetError(txtTitulo, "");
+            }
+        }
+
+        private void txtTituloEpisodio_Validating(object sender, CancelEventArgs e)
+        {
+            // Solo validar si no es ReadOnly (es decir, entrada manual)
+            if (!txtTituloEpisodio.ReadOnly && !string.IsNullOrWhiteSpace(txtTituloEpisodio.Text))
+            {
+                if (txtTituloEpisodio.Text.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0)
+                {
+                    errorProvider.SetError(txtTituloEpisodio, "El título contiene caracteres no válidos para un nombre de archivo");
+                    e.Cancel = true;
+                }
+                else
+                {
+                    errorProvider.SetError(txtTituloEpisodio, "");
+                }
+            }
+            else
+            {
+                errorProvider.SetError(txtTituloEpisodio, "");
             }
         }
 

@@ -40,7 +40,7 @@ namespace organizadorCapitulos.Tests.Application.Strategies
         }
 
         [Fact]
-        public void GetNewFileName_ShouldGenerateCorrectFormat()
+        public void GetNewFileName_WithoutEpisodeTitle_ShouldGenerateCorrectFormat()
         {
             // Arrange
             var strategy = new MaintainRenameStrategy();
@@ -56,6 +56,26 @@ namespace organizadorCapitulos.Tests.Application.Strategies
 
             // Assert
             Assert.Equal("My Series - S02E10", result);
+        }
+
+        [Fact]
+        public void GetNewFileName_WithEpisodeTitle_ShouldGenerateCorrectFormat()
+        {
+            // Arrange
+            var strategy = new MaintainRenameStrategy();
+            var chapterInfo = new ChapterInfo
+            {
+                Season = 2,
+                Chapter = 10,
+                Title = "My Series",
+                EpisodeTitle = "The Great Adventure"
+            };
+
+            // Act
+            var result = strategy.GetNewFileName("original.mp4", chapterInfo);
+
+            // Assert
+            Assert.Equal("My Series The Great Adventure S02E10", result);
         }
     }
 }

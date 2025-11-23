@@ -28,51 +28,47 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.progressBar = new System.Windows.Forms.ProgressBar();
             this.lblProgress = new System.Windows.Forms.Label();
             this.lblFile = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
-            // progressBar
-            // 
-            this.progressBar.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.progressBar.Location = new System.Drawing.Point(12, 41);
-            this.progressBar.Name = "progressBar";
-            this.progressBar.Size = new System.Drawing.Size(360, 23);
-            this.progressBar.TabIndex = 0;
-            // 
             // lblProgress
             // 
             this.lblProgress.AutoSize = true;
-            this.lblProgress.Location = new System.Drawing.Point(12, 15);
+            this.lblProgress.Font = new System.Drawing.Font("Segoe UI Semibold", 10F, System.Drawing.FontStyle.Bold);
+            this.lblProgress.ForeColor = System.Drawing.Color.FromArgb(55, 65, 81);
+            this.lblProgress.Location = new System.Drawing.Point(20, 20);
             this.lblProgress.Name = "lblProgress";
-            this.lblProgress.Size = new System.Drawing.Size(0, 13);
+            this.lblProgress.Size = new System.Drawing.Size(0, 19);
             this.lblProgress.TabIndex = 1;
             // 
             // lblFile
             // 
             this.lblFile.AutoSize = true;
-            this.lblFile.Location = new System.Drawing.Point(12, 71);
+            this.lblFile.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.lblFile.ForeColor = System.Drawing.Color.FromArgb(107, 114, 128);
+            this.lblFile.Location = new System.Drawing.Point(20, 95);
+            this.lblFile.MaximumSize = new System.Drawing.Size(460, 0);
             this.lblFile.Name = "lblFile";
-            this.lblFile.Size = new System.Drawing.Size(0, 13);
+            this.lblFile.Size = new System.Drawing.Size(0, 15);
             this.lblFile.TabIndex = 2;
             // 
             // ProgressForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(384, 111);
+            this.BackColor = System.Drawing.Color.FromArgb(249, 250, 251);
+            this.ClientSize = new System.Drawing.Size(500, 140);
             this.Controls.Add(this.lblFile);
             this.Controls.Add(this.lblProgress);
-            this.Controls.Add(this.progressBar);
+            this.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "ProgressForm";
             this.ShowIcon = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Progreso";
+            this.Text = "⏳ Progreso";
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -80,7 +76,6 @@
 
         #endregion
 
-        private System.Windows.Forms.ProgressBar progressBar;
         private System.Windows.Forms.Label lblProgress;
         private System.Windows.Forms.Label lblFile;
     }

@@ -122,5 +122,43 @@ namespace organizadorCapitulos.Tests.Core.Entities
                 Assert.False(result, $"Should be invalid with character: {invalidChar}");
             }
         }
+
+        [Fact]
+        public void GenerateFileName_WithEpisodeTitle_ShouldFormatCorrectly()
+        {
+            // Arrange
+            var chapterInfo = new ChapterInfo
+            {
+                Season = 2,
+                Chapter = 15,
+                Title = "My Series",
+                EpisodeTitle = "The Great Adventure"
+            };
+
+            // Act
+            string fileName = chapterInfo.GenerateFileName(".mkv");
+
+            // Assert
+            Assert.Equal("My Series The Great Adventure S02E15.mkv", fileName);
+        }
+
+        [Fact]
+        public void GenerateFileName_WithEpisodeTitle_ShouldTrimBothTitles()
+        {
+            // Arrange
+            var chapterInfo = new ChapterInfo
+            {
+                Season = 1,
+                Chapter = 1,
+                Title = "  My Series  ",
+                EpisodeTitle = "  Episode Title  "
+            };
+
+            // Act
+            string fileName = chapterInfo.GenerateFileName(".mp4");
+
+            // Assert
+            Assert.Equal("My Series Episode Title S01E01.mp4", fileName);
+        }
     }
 }

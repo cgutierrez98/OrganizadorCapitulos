@@ -12,9 +12,16 @@ namespace organizadorCapitulos.Application.Strategies
     {
         public string GetNewFileName(string originalFileName, ChapterInfo info)
         {
-            // Aquí va tu lógica compleja para buscar números viejos y reemplazarlos
-            // Ejemplo simple:
-            return $"{info.Title} - S{info.Season:D2}E{info.Chapter:D2}";
+            if (!string.IsNullOrWhiteSpace(info.EpisodeTitle))
+            {
+                // Formato con título de episodio: "NombreSerie Titulo S##E##"
+                return $"{info.Title} {info.EpisodeTitle} S{info.Season:D2}E{info.Chapter:D2}";
+            }
+            else
+            {
+                // Formato sin título de episodio: "NombreSerie - S##E##"
+                return $"{info.Title} - S{info.Season:D2}E{info.Chapter:D2}";
+            }
         }
 
         public void UpdateAfterRename(ChapterInfo info)
