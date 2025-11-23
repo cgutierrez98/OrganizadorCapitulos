@@ -5,7 +5,7 @@ namespace organizadorCapitulos.UI.Forms
 {
     public partial class SettingsForm : Form
     {
-        public string ApiKey { get; private set; }
+        public string? ApiKey { get; private set; }
 
         public SettingsForm(string currentApiKey)
         {

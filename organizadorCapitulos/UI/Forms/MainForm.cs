@@ -207,7 +207,7 @@ namespace organizadorCapitulos.UI.Forms
             {
                 if (settingsForm.ShowDialog(this) == DialogResult.OK)
                 {
-                    _metadataService.Configure(settingsForm.ApiKey);
+                    _metadataService.Configure(settingsForm.ApiKey ?? string.Empty);
                     UpdateStatus("Configuración actualizada.");
                 }
             }
@@ -267,7 +267,7 @@ namespace organizadorCapitulos.UI.Forms
                     // This is a simplified parser, ideally we'd use a regex or the existing logic if exposed
                     if (TryExtractSeasonEpisode(filename, out int season, out int episode))
                     {
-                        string title = await _metadataService.GetEpisodeTitleAsync(selectedSeries.Id, season, episode);
+                        string? title = await _metadataService.GetEpisodeTitleAsync(selectedSeries.Id, season, episode);
                         if (!string.IsNullOrEmpty(title))
                         {
                             // Store the found title in the Tag (for later use)
@@ -350,7 +350,9 @@ namespace organizadorCapitulos.UI.Forms
             {
                 // 3. CALCULAR (Sin mover nada)
                 // Obtenemos el directorio y la extensión del archivo original
-                string directory = Path.GetDirectoryName(originalFilePath);
+                string? directory = Path.GetDirectoryName(originalFilePath);
+                if (string.IsNullOrEmpty(directory)) return;
+
                 string extension = Path.GetExtension(originalFilePath);
                 string originalNameNoExt = Path.GetFileNameWithoutExtension(originalFilePath);
 
@@ -402,7 +404,7 @@ namespace organizadorCapitulos.UI.Forms
                 return;
             }
 
-            string carpetaDestino = SeleccionarCarpeta();
+            string? carpetaDestino = SeleccionarCarpeta();
             if (string.IsNullOrEmpty(carpetaDestino)) return;
 
             var sourcePaths = listViewSeries.Items.Cast<ListViewItem>()
@@ -533,7 +535,7 @@ namespace organizadorCapitulos.UI.Forms
             }
         }
 
-        private string SeleccionarCarpeta()
+        private string? SeleccionarCarpeta()
         {
             using (var folderBrowser = new FolderBrowserForm())
             {
@@ -573,7 +575,7 @@ namespace organizadorCapitulos.UI.Forms
             }
         }
 
-        private void txtTemporada_Validating(object sender, CancelEventArgs e)
+        private void txtTemporada_Validating(object? sender, CancelEventArgs e)
         {
             if (string.IsNullOrWhiteSpace(txtTemporada.Text) || !int.TryParse(txtTemporada.Text, out int temp) || temp <= 0)
             {
@@ -586,7 +588,7 @@ namespace organizadorCapitulos.UI.Forms
             }
         }
 
-        private void txtCapitulo_Validating(object sender, CancelEventArgs e)
+        private void txtCapitulo_Validating(object? sender, CancelEventArgs e)
         {
             if (string.IsNullOrWhiteSpace(txtCapitulo.Text) || !int.TryParse(txtCapitulo.Text, out int cap) || cap <= 0)
             {
@@ -599,7 +601,7 @@ namespace organizadorCapitulos.UI.Forms
             }
         }
 
-        private void txtTitulo_Validating(object sender, CancelEventArgs e)
+        private void txtTitulo_Validating(object? sender, CancelEventArgs e)
         {
             if (string.IsNullOrWhiteSpace(txtTitulo.Text))
             {
@@ -617,7 +619,7 @@ namespace organizadorCapitulos.UI.Forms
             }
         }
 
-        private void txtTituloEpisodio_Validating(object sender, CancelEventArgs e)
+        private void txtTituloEpisodio_Validating(object? sender, CancelEventArgs e)
         {
             // Solo validar si no es ReadOnly (es decir, entrada manual)
             if (!txtTituloEpisodio.ReadOnly && !string.IsNullOrWhiteSpace(txtTituloEpisodio.Text))

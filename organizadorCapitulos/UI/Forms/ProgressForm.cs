@@ -9,9 +9,9 @@ namespace organizadorCapitulos
     public partial class ProgressForm : Form, IProgressObserver
     {
         // Custom controls for modern progress bar
-        private Panel pnlTrack;
-        private Panel pnlProgress;
-        private System.Windows.Forms.Timer animationTimer;
+        private Panel pnlTrack = null!;
+        private Panel pnlProgress = null!;
+        private System.Windows.Forms.Timer animationTimer = null!;
         private float currentWidth = 0;
         private float targetWidth = 0;
         private int totalFiles = 1;
@@ -65,7 +65,7 @@ namespace organizadorCapitulos
             animationTimer.Start();
         }
 
-        private void AnimationTimer_Tick(object sender, EventArgs e)
+        private void AnimationTimer_Tick(object? sender, EventArgs e)
         {
             // Smooth interpolation
             if (Math.Abs(currentWidth - targetWidth) > 0.1f)

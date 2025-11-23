@@ -12,7 +12,7 @@ namespace organizadorCapitulos.Infrastructure.Services
     public class TmdbMetadataService : IMetadataService
     {
         private readonly HttpClient _httpClient;
-        private string _apiKey;
+        private string? _apiKey;
         private const string BaseUrl = "https://api.themoviedb.org/3";
 
         public TmdbMetadataService()
@@ -52,10 +52,10 @@ namespace organizadorCapitulos.Infrastructure.Services
                             results.Add(new SeriesSearchResult
                             {
                                 Id = element.GetProperty("id").GetInt32(),
-                                Name = element.TryGetProperty("name", out var name) ? name.GetString() : "Unknown",
-                                OriginalName = element.TryGetProperty("original_name", out var originalName) ? originalName.GetString() : "Unknown",
-                                FirstAirDate = element.TryGetProperty("first_air_date", out var date) ? date.GetString() : "",
-                                Overview = element.TryGetProperty("overview", out var overview) ? overview.GetString() : ""
+                                Name = element.TryGetProperty("name", out var name) ? (name.GetString() ?? "Unknown") : "Unknown",
+                                OriginalName = element.TryGetProperty("original_name", out var originalName) ? (originalName.GetString() ?? "Unknown") : "Unknown",
+                                FirstAirDate = element.TryGetProperty("first_air_date", out var date) ? (date.GetString() ?? "") : "",
+                                Overview = element.TryGetProperty("overview", out var overview) ? (overview.GetString() ?? "") : ""
                             });
                         }
                     }
@@ -70,7 +70,7 @@ namespace organizadorCapitulos.Infrastructure.Services
             }
         }
 
-        public async Task<string> GetEpisodeTitleAsync(int seriesId, int season, int episode)
+        public async Task<string?> GetEpisodeTitleAsync(int seriesId, int season, int episode)
         {
             if (!IsConfigured()) throw new InvalidOperationException("API Key not configured.");
 

@@ -18,8 +18,9 @@ namespace organizadorCapitulos.Application.Comparers
             _order = sortOrder;
         }
 
-        public int Compare(object x, object y)
+        public int Compare(object? x, object? y)
         {
+            if (x == null || y == null) return 0;
             int returnVal = string.Compare(
                 ((ListViewItem)x).SubItems[_column].Text,
                 ((ListViewItem)y).SubItems[_column].Text);

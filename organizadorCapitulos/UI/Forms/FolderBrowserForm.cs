@@ -37,7 +37,7 @@ namespace organizadorCapitulos
         {
             try
             {
-                string path = parentNode.Tag as string;
+                string? path = parentNode.Tag as string;
                 if (string.IsNullOrEmpty(path)) return;
 
                 parentNode.Nodes.Clear();
@@ -60,27 +60,33 @@ namespace organizadorCapitulos
             }
         }
 
-        private void treeViewFolders_AfterCheck(object sender, TreeViewEventArgs e)
+        private void treeViewFolders_AfterCheck(object? sender, TreeViewEventArgs e)
         {
             // Evitar reentrancia si estamos modificando programáticamente
             treeViewFolders.AfterCheck -= treeViewFolders_AfterCheck;
 
             try
             {
+                if (e.Node == null) return;
+
                 if (IsSingleSelectionMode && e.Node.Checked)
                 {
                     UncheckOtherNodes(treeViewFolders.Nodes, e.Node);
                     SelectedFolders.Clear(); // Limpiar selección anterior
                 }
 
-                if (e.Node.Checked)
+                string? tag = e.Node.Tag?.ToString();
+                if (tag != null)
                 {
-                    if (!SelectedFolders.Contains(e.Node.Tag.ToString()))
-                        SelectedFolders.Add(e.Node.Tag.ToString());
-                }
-                else
-                {
-                    SelectedFolders.Remove(e.Node.Tag.ToString());
+                    if (e.Node.Checked)
+                    {
+                        if (!SelectedFolders.Contains(tag))
+                            SelectedFolders.Add(tag);
+                    }
+                    else
+                    {
+                        SelectedFolders.Remove(tag);
+                    }
                 }
 
                 // Actualizar el contador de carpetas seleccionadas
@@ -109,7 +115,7 @@ namespace organizadorCapitulos
 
         private void treeViewFolders_BeforeExpand(object sender, TreeViewCancelEventArgs e)
         {
-            if (e.Node.Nodes.Count == 1 && e.Node.Nodes[0].Text == "...")
+            if (e.Node != null && e.Node.Nodes.Count == 1 && e.Node.Nodes[0].Text == "...")
             {
                 e.Node.Nodes.Clear();
                 LoadSubdirectories(e.Node);

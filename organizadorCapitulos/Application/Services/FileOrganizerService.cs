@@ -36,7 +36,8 @@ namespace organizadorCapitulos.Application.Services
 
             string extension = System.IO.Path.GetExtension(sourcePath);
             string newFileName = chapterInfo.GenerateFileName(extension);
-            string directory = System.IO.Path.GetDirectoryName(sourcePath);
+            string? directory = System.IO.Path.GetDirectoryName(sourcePath);
+            if (string.IsNullOrEmpty(directory)) throw new InvalidOperationException("No se pudo obtener el directorio del archivo.");
             string destinationPath = System.IO.Path.Combine(directory, newFileName);
 
             if (_fileRepository.FileExists(destinationPath))
