@@ -7,7 +7,12 @@
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
     <DefaultItemExcludes>$(DefaultItemExcludes);organizadorCapitulos.Tests\**</DefaultItemExcludes>
+    <ApplicationIcon>Assets\Logo.ico</ApplicationIcon>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="Assets\Logo.ico" />
+  </ItemGroup>
 
   <ItemGroup>
     <None Update="Assets\Logo.ico">
