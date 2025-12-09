@@ -45,7 +45,7 @@
             treeViewFolders.Size = new Size(1197, 778);
             treeViewFolders.TabIndex = 0;
             treeViewFolders.AfterCheck += TreeViewFolders_AfterCheck;
-            treeViewFolders.BeforeExpand += treeViewFolders_BeforeExpand;
+            treeViewFolders.BeforeExpand += TreeViewFolders_BeforeExpand;
             // 
             // btnAceptar
             // 
@@ -65,7 +65,7 @@
             btnAceptar.Text = "✓ Aceptar";
             btnAceptar.TextImageRelation = TextImageRelation.ImageBeforeText;
             btnAceptar.UseVisualStyleBackColor = false;
-            btnAceptar.Click += btnAceptar_Click;
+            btnAceptar.Click += BtnAceptar_Click;
             // 
             // btnCancelar
             // 
@@ -85,7 +85,7 @@
             btnCancelar.Text = "✕ Cancelar";
             btnCancelar.TextImageRelation = TextImageRelation.ImageBeforeText;
             btnCancelar.UseVisualStyleBackColor = false;
-            btnCancelar.Click += btnCancelar_Click;
+            btnCancelar.Click += BtnCancelar_Click;
             // 
             // tableLayoutPanel1
             // 
@@ -135,7 +135,7 @@
             btnExpandAll.Text = "▼ Expandir todo";
             btnExpandAll.TextImageRelation = TextImageRelation.ImageBeforeText;
             btnExpandAll.UseVisualStyleBackColor = false;
-            btnExpandAll.Click += btnExpandAll_Click;
+            btnExpandAll.Click += BtnExpandAll_Click;
             // 
             // btnCollapseAll
             // 
@@ -155,7 +155,7 @@
             btnCollapseAll.Text = "▶ Colapsar todo";
             btnCollapseAll.TextImageRelation = TextImageRelation.ImageBeforeText;
             btnCollapseAll.UseVisualStyleBackColor = false;
-            btnCollapseAll.Click += btnCollapseAll_Click;
+            btnCollapseAll.Click += BtnCollapseAll_Click;
             // 
             // lblStatus
             // 

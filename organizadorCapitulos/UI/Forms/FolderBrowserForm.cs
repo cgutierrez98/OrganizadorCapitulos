@@ -102,7 +102,7 @@ namespace organizadorCapitulos
             }
         }
 
-        private void UncheckOtherNodes(TreeNodeCollection nodes, TreeNode current)
+        private static void UncheckOtherNodes(TreeNodeCollection nodes, TreeNode current)
         {
             foreach (TreeNode node in nodes)
             {
@@ -114,7 +114,7 @@ namespace organizadorCapitulos
             }
         }
 
-        private void treeViewFolders_BeforeExpand(object sender, TreeViewCancelEventArgs e)
+        private void TreeViewFolders_BeforeExpand(object sender, TreeViewCancelEventArgs e)
         {
             if (e.Node != null && e.Node.Nodes.Count == 1 && e.Node.Nodes[0].Text == "...")
             {
@@ -123,7 +123,7 @@ namespace organizadorCapitulos
             }
         }
 
-        private void btnAceptar_Click(object sender, EventArgs e)
+        private void BtnAceptar_Click(object sender, EventArgs e)
         {
             if (SelectedFolders.Count == 0)
             {
@@ -141,13 +141,13 @@ namespace organizadorCapitulos
             this.Close();
         }
 
-        private void btnCancelar_Click(object sender, EventArgs e)
+        private void BtnCancelar_Click(object sender, EventArgs e)
         {
             this.DialogResult = DialogResult.Cancel;
             this.Close();
         }
 
-        private int CountCheckedNodes(TreeNodeCollection nodes)
+        private static int CountCheckedNodes(TreeNodeCollection nodes)
         {
             int count = 0;
             foreach (TreeNode node in nodes)
@@ -159,7 +159,7 @@ namespace organizadorCapitulos
             return count;
         }
 
-        private void btnExpandAll_Click(object sender, EventArgs e)
+        private void BtnExpandAll_Click(object sender, EventArgs e)
         {
             treeViewFolders.BeginUpdate();
             try
@@ -172,7 +172,7 @@ namespace organizadorCapitulos
             }
         }
 
-        private void btnCollapseAll_Click(object sender, EventArgs e)
+        private void BtnCollapseAll_Click(object sender, EventArgs e)
         {
             treeViewFolders.BeginUpdate();
             try
@@ -185,7 +185,7 @@ namespace organizadorCapitulos
             }
         }
 
-        private void ExpandAllNodes(TreeNodeCollection nodes, bool expand)
+        private static void ExpandAllNodes(TreeNodeCollection nodes, bool expand)
         {
             foreach (TreeNode node in nodes)
             {

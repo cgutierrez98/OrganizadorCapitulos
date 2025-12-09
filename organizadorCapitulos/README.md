@@ -55,7 +55,7 @@ El sistema cuenta con diferentes modos de trabajo adaptables:
 ## 🛠️ Tecnologías
 
 - **Lenguaje**: C#
-- **Framework**: .NET 8.0 (Windows Forms)
+- **Framework**: .NET 9.0 (Windows Forms)
 - **Patrones de Diseño**:
   - **Strategy**: Para los algoritmos de renombrado.
   - **Command**: Para las operaciones de deshacer/rehacer.

@@ -31,6 +31,7 @@ namespace organizadorCapitulos.UI.Forms
         private readonly CommandManager _commandManager;
         private readonly ProgressNotifier _progressNotifier;
         private readonly IMetadataService _metadataService;
+        private readonly IAIService _aiService;
 
         private IRenameStrategy _currentStrategy;
         private SortOrder _lastSortOrder = SortOrder.None;
@@ -47,6 +48,7 @@ namespace organizadorCapitulos.UI.Forms
             _strategyFactory = new RenameStrategyFactory();
             _commandManager = new CommandManager();
             _metadataService = new TmdbMetadataService();
+            _aiService = new PythonAIService();
 
             _progressNotifier.Subscribe(this);
             _currentStrategy = _strategyFactory.CreateStrategy(RenameMode.Maintain);
@@ -58,10 +60,10 @@ namespace organizadorCapitulos.UI.Forms
 
         private void ConfigureValidation()
         {
-            txtTemporada.Validating += txtTemporada_Validating;
-            txtCapitulo.Validating += txtCapitulo_Validating;
-            txtTitulo.Validating += txtTitulo_Validating;
-            txtTituloEpisodio.Validating += txtTituloEpisodio_Validating;
+            txtTemporada.Validating += TxtTemporada_Validating;
+            txtCapitulo.Validating += TxtCapitulo_Validating;
+            txtTitulo.Validating += TxtTitulo_Validating;
+            txtTituloEpisodio.Validating += TxtTituloEpisodio_Validating;
         }
 
         private void UpdateUIState()
@@ -86,7 +88,7 @@ namespace organizadorCapitulos.UI.Forms
         }
 
         #region Event Handlers
-        private void listViewSeries_SelectedIndexChanged(object sender, EventArgs e)
+        private void ListViewSeries_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (listViewSeries.SelectedItems.Count > 0)
             {
@@ -105,11 +107,13 @@ namespace organizadorCapitulos.UI.Forms
                     txtTituloEpisodio.ReadOnly = false;
                     txtTituloEpisodio.BackColor = Color.White;
                 }
+
+                UpdatePreview(selectedItem);
             }
             UpdateUIState();
         }
 
-        private void listViewSeries_ColumnClick(object sender, ColumnClickEventArgs e)
+        private void ListViewSeries_ColumnClick(object sender, ColumnClickEventArgs e)
         {
             if (e.Column == _lastColumnSorted)
             {
@@ -126,7 +130,7 @@ namespace organizadorCapitulos.UI.Forms
             UpdateColumnHeaders(e.Column);
         }
 
-        private void radioMantener_CheckedChanged(object sender, EventArgs e)
+        private void RadioMantener_CheckedChanged(object sender, EventArgs e)
         {
             if (radioMantener.Checked)
             {
@@ -135,7 +139,7 @@ namespace organizadorCapitulos.UI.Forms
             }
         }
 
-        private void radioCambiar_CheckedChanged(object sender, EventArgs e)
+        private void RadioCambiar_CheckedChanged(object sender, EventArgs e)
         {
             if (radioCambiar.Checked)
             {
@@ -144,12 +148,12 @@ namespace organizadorCapitulos.UI.Forms
             }
         }
 
-        private async void btnGuardar_Click(object sender, EventArgs e)
+        private async void BtnGuardar_Click(object sender, EventArgs e)
         {
             await RenombrarCapituloAsync();
         }
 
-        private async void onClickEnter(object sender, KeyEventArgs e)
+        private async void OnClickEnter(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
             {
@@ -159,17 +163,17 @@ namespace organizadorCapitulos.UI.Forms
             }
         }
 
-        private async void btnGuardarTodo_Click(object sender, EventArgs e)
+        private async void BtnGuardarTodo_Click(object sender, EventArgs e)
         {
             await GuardarTodoAsync();
         }
 
-        private async void btnCargarCarpetas_Click(object sender, EventArgs e)
+        private async void BtnCargarCarpetas_Click(object sender, EventArgs e)
         {
             await CargarCarpetasAsync();
         }
 
-        private async void btnUndo_Click(object sender, EventArgs e)
+        private async void BtnUndo_Click(object sender, EventArgs e)
         {
             try
             {
@@ -183,7 +187,7 @@ namespace organizadorCapitulos.UI.Forms
             }
         }
 
-        private async void btnRedo_Click(object sender, EventArgs e)
+        private async void BtnRedo_Click(object sender, EventArgs e)
         {
             try
             {
@@ -197,28 +201,26 @@ namespace organizadorCapitulos.UI.Forms
             }
         }
 
-        private void btnSettings_Click(object sender, EventArgs e)
+        private void BtnSettings_Click(object sender, EventArgs e)
         {
             // We'll use a property or method to get/set the key. For now let's assume we pass empty string if not set.
             // In a real app we would store this in Properties.Settings.Default
             string currentKey = _metadataService.IsConfigured() ? "********" : "";
 
-            using (var settingsForm = new SettingsForm(currentKey))
+            using var settingsForm = new SettingsForm(currentKey);
+            if (settingsForm.ShowDialog(this) == DialogResult.OK)
             {
-                if (settingsForm.ShowDialog(this) == DialogResult.OK)
-                {
-                    _metadataService.Configure(settingsForm.ApiKey ?? string.Empty);
-                    UpdateStatus("Configuración actualizada.");
-                }
+                _metadataService.Configure(settingsForm.ApiKey ?? string.Empty);
+                UpdateStatus("Configuración actualizada.");
             }
         }
 
-        private async void btnMetadata_Click(object sender, EventArgs e)
+        private async void BtnMetadata_Click(object sender, EventArgs e)
         {
             if (!_metadataService.IsConfigured())
             {
                 MessageBox.Show("Por favor configura la API Key de TMDB primero.", "Configuración requerida", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                btnSettings_Click(sender, e);
+                BtnSettings_Click(sender, e);
                 if (!_metadataService.IsConfigured()) return;
             }
 
@@ -264,7 +266,6 @@ namespace organizadorCapitulos.UI.Forms
                     progressForm.UpdateProgress(current, total, filename);
 
                     // Try to parse S and E from filename
-                    // This is a simplified parser, ideally we'd use a regex or the existing logic if exposed
                     if (TryExtractSeasonEpisode(filename, out int season, out int episode))
                     {
                         string? title = await _metadataService.GetEpisodeTitleAsync(selectedSeries.Id, season, episode);
@@ -273,14 +274,10 @@ namespace organizadorCapitulos.UI.Forms
                             // Store the found title in the Tag (for later use)
                             item.Tag = title;
 
-                            // Ensure there is a third column (SubItems[2]) and set the title there so the user sees it immediately
-                            if (item.SubItems.Count < 3)
+                            // Ensure we have enough subitems
+                            while (item.SubItems.Count < 4)
                             {
-                                // Add empty subitems until we have at least 3
-                                while (item.SubItems.Count < 3)
-                                {
-                                    item.SubItems.Add(string.Empty);
-                                }
+                                item.SubItems.Add(string.Empty);
                             }
 
                             item.SubItems[2].Text = title;
@@ -288,12 +285,107 @@ namespace organizadorCapitulos.UI.Forms
                     }
                 }
 
-                // Refresh to make sure UI updates
-                listViewSeries.Refresh();
             }
+
+            // Refresh to make sure UI updates
+            listViewSeries.Refresh();
 
             UpdateStatus("Metadatos descargados. Selecciona un archivo para ver el título sugerido.");
             MessageBox.Show("Búsqueda completada. Los títulos se han guardado en memoria y se muestran en la lista.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+            // Update preview for all items
+            foreach (ListViewItem item in listViewSeries.Items)
+            {
+                UpdatePreview(item);
+            }
+        }
+
+        private async void BtnAIAnalyze_Click(object sender, EventArgs e)
+        {
+            if (!_aiService.IsAvailable())
+            {
+                MessageBox.Show("No se encontró el servicio de IA (Python o ejecutable). Por favor verifica la instalación.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            if (listViewSeries.Items.Count == 0)
+            {
+                MessageBox.Show("Carga archivos primero.", "Información", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            UpdateStatus("Iniciando análisis con IA...");
+
+            using (var progressForm = new ProgressForm())
+            {
+                progressForm.Show();
+                int total = listViewSeries.Items.Count;
+                int current = 0;
+
+                foreach (ListViewItem item in listViewSeries.Items)
+                {
+                    current++;
+                    string filename = item.Text;
+                    progressForm.UpdateProgress(current, total, $"Analizando: {filename}");
+
+                    var info = await _aiService.AnalyzeFilenameAsync(filename);
+                    if (info != null)
+                    {
+                        // Update UI with AI results
+                        // Temporada
+                        if (info.Season > 0)
+                        {
+                            // Store in a temporary way or update the textboxes if selected?
+                            // For now, let's update the item's Tag or SubItems if we want to persist it
+                        }
+
+                        // Titulo Episodio
+                        if (!string.IsNullOrEmpty(info.EpisodeTitle))
+                        {
+                            item.Tag = info.EpisodeTitle;
+                            while (item.SubItems.Count < 3) item.SubItems.Add("");
+                            item.SubItems[2].Text = info.EpisodeTitle;
+                        }
+
+                        // If we found season/episode, we might want to override the default parsing
+                        // But the current architecture parses on the fly in UpdatePreview using TryExtractSeasonEpisode
+                        // We should probably update that method to check for AI data attached to the item
+
+                        // Let's attach the full info object to the item for UpdatePreview to use
+                        // But Tag is currently string (EpisodeTitle). Let's change Tag to be more flexible or use a dictionary?
+                        // For simplicity, let's just update the text if it's selected, or rely on the user seeing the preview.
+
+                        // Actually, UpdatePreview calls TryExtractSeasonEpisode(item.Text...)
+                        // We can't easily inject the AI result into that logic without refactoring.
+                        // So let's do a trick: We will rename the file in the ListView to a "normalized" standard format that our regex understands perfectly?
+                        // No, that changes the source filename visually which is confusing.
+
+                        // Better approach: Store the AI result in a Dictionary<ListViewItem, ChapterInfo> in the form?
+                        // Or just use the Tag. Currently Tag is `string episodeTitle`.
+                        // Let's make Tag a `ChapterInfo` object?
+                        // Existing code: `if (selectedItem.Tag is string episodeTitle ...)`
+                        // I should verify if I can change Tag usage safely.
+
+                        // Let's check `listViewSeries_SelectedIndexChanged`:
+                        // if (selectedItem.Tag is string episodeTitle && !string.IsNullOrWhiteSpace(episodeTitle))
+
+                        // I will change Tag to hold ChapterInfo, but I need to update the other usage.
+                        // OR, I can just keep Tag as string for Episode Title (which is what AI gives mostly)
+                        // AND maybe encode Season/Episode in the string? No that's hacky.
+
+                        // Let's just update the Episode Title for now, which is the main value add.
+                        // And if the AI finds a Series Name, we can update txtTitulo if it's the first item.
+
+                        if (current == 1 && !string.IsNullOrEmpty(info.Title))
+                        {
+                            txtTitulo.Text = info.Title;
+                        }
+                    }
+                }
+            }
+
+            UpdateStatus("Análisis de IA completado.");
+            foreach (ListViewItem item in listViewSeries.Items) UpdatePreview(item);
         }
 
         private bool TryExtractSeasonEpisode(string filename, out int season, out int episode)
@@ -411,30 +503,28 @@ namespace organizadorCapitulos.UI.Forms
                 .Select(item => item.SubItems[1].Text)
                 .ToList();
 
-            using (ProgressForm progressForm = new ProgressForm())
+            using ProgressForm progressForm = new();
+            progressForm.Show();
+
+            try
             {
-                progressForm.Show();
+                var moveCommand = new MoveFilesCommand(_fileRepository, progressForm, sourcePaths, carpetaDestino);
+                await _commandManager.ExecuteCommandAsync(moveCommand);
 
-                try
+                // Actualizar ListView con nuevas rutas
+                for (int i = 0; i < listViewSeries.Items.Count; i++)
                 {
-                    var moveCommand = new MoveFilesCommand(_fileRepository, progressForm, sourcePaths, carpetaDestino);
-                    await _commandManager.ExecuteCommandAsync(moveCommand);
-
-                    // Actualizar ListView con nuevas rutas
-                    for (int i = 0; i < listViewSeries.Items.Count; i++)
-                    {
-                        string newPath = Path.Combine(carpetaDestino, Path.GetFileName(sourcePaths[i]));
-                        listViewSeries.Items[i].SubItems[1].Text = newPath;
-                    }
-
-                    UpdateStatus($"Todos los archivos movidos a: {carpetaDestino}");
-                    MessageBox.Show("Todos los archivos fueron movidos exitosamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    string newPath = Path.Combine(carpetaDestino, Path.GetFileName(sourcePaths[i]));
+                    listViewSeries.Items[i].SubItems[1].Text = newPath;
                 }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    UpdateStatus($"Error al mover archivos: {ex.Message}");
-                }
+
+                UpdateStatus($"Todos los archivos movidos a: {carpetaDestino}");
+                MessageBox.Show("Todos los archivos fueron movidos exitosamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                UpdateStatus($"Error al mover archivos: {ex.Message}");
             }
 
             UpdateUIState();
@@ -442,53 +532,46 @@ namespace organizadorCapitulos.UI.Forms
 
         private async Task CargarCarpetasAsync()
         {
+            using var folderBrowser = new FolderBrowserForm();
+            if (folderBrowser.ShowDialog(this) != DialogResult.OK || folderBrowser.SelectedFolders.Count == 0)
             {
-                using (var folderBrowser = new FolderBrowserForm())
+                return;
+            }
+
+            listViewSeries.Items.Clear();
+            UpdateStatus("Cargando archivos de video...");
+
+            using ProgressForm progressForm = new();
+            progressForm.Show();
+
+            try
+            {
+                var files = await _fileOrganizerService.LoadVideoFilesAsync(folderBrowser.SelectedFolders);
+
+                int totalFiles = files.Count;
+                int processedFiles = 0;
+
+                foreach (string file in files)
                 {
-                    if (folderBrowser.ShowDialog(this) != DialogResult.OK || folderBrowser.SelectedFolders.Count == 0)
-                    {
-                        return;
-                    }
+                    processedFiles++;
+                    UpdateProgress(processedFiles, totalFiles, Path.GetFileName(file));
 
-                    listViewSeries.Items.Clear();
-                    UpdateStatus("Cargando archivos de video...");
+                    ListViewItem item = new ListViewItem(Path.GetFileName(file));
+                    item.SubItems.Add(file);
 
-                    using (ProgressForm progressForm = new ProgressForm())
-                    {
-                        progressForm.Show();
+                    // Ensure we have a third (title) column available from the start so later metadata can be placed at SubItems[2]
+                    item.SubItems.Add(string.Empty);
 
-                        try
-                        {
-                            var files = await _fileOrganizerService.LoadVideoFilesAsync(folderBrowser.SelectedFolders);
-
-                            int totalFiles = files.Count;
-                            int processedFiles = 0;
-
-                            foreach (string file in files)
-                            {
-                                processedFiles++;
-                                UpdateProgress(processedFiles, totalFiles, Path.GetFileName(file));
-
-                                ListViewItem item = new ListViewItem(Path.GetFileName(file));
-                                item.SubItems.Add(file);
-
-                                // Ensure we have a third (title) column available from the start so later metadata can be placed at SubItems[2]
-                                item.SubItems.Add(string.Empty);
-
-                                listViewSeries.Items.Add(item);
-                            }
-
-                            UpdateStatus($"Carga completada: {listViewSeries.Items.Count} archivos encontrados");
-                            MessageBox.Show($"Se cargaron {listViewSeries.Items.Count} archivos de video.",
-                                "Carga completada", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        }
-                        catch (Exception ex)
-                        {
-                            MessageBox.Show($"Error al cargar archivos: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            UpdateStatus($"Error en carga: {ex.Message}");
-                        }
-                    }
+                    listViewSeries.Items.Add(item);
                 }
+
+                UpdateStatus($"Carga completada: {listViewSeries.Items.Count} archivos encontrados");
+                MessageBox.Show($"Se cargaron {listViewSeries.Items.Count} archivos de video.",
+                    "Carga completada", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error al cargar archivos: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
         #endregion
@@ -537,16 +620,69 @@ namespace organizadorCapitulos.UI.Forms
 
         private string? SeleccionarCarpeta()
         {
-            using (var folderBrowser = new FolderBrowserForm())
-            {
-                folderBrowser.Text = "Selecciona Carpeta Destino";
-                folderBrowser.IsSingleSelectionMode = true;
+            using var folderBrowser = new FolderBrowserForm();
+            folderBrowser.Text = "Selecciona Carpeta Destino";
+            folderBrowser.IsSingleSelectionMode = true;
 
-                if (folderBrowser.ShowDialog(this) == DialogResult.OK && folderBrowser.SelectedFolders.Count > 0)
+            if (folderBrowser.ShowDialog(this) == DialogResult.OK && folderBrowser.SelectedFolders.Count > 0)
+            {
+                return folderBrowser.SelectedFolders[0];
+            }
+            return null;
+        }
+
+        private void UpdatePreview(ListViewItem item)
+        {
+            // Ensure we have enough subitems
+            while (item.SubItems.Count < 4)
+            {
+                item.SubItems.Add(string.Empty);
+            }
+
+            string originalFilePath = item.SubItems[1].Text;
+            string extension = Path.GetExtension(originalFilePath);
+            string originalNameNoExt = Path.GetFileNameWithoutExtension(originalFilePath);
+
+            // Try to extract info from the item or use defaults
+            int season = 1;
+            int episode = 1;
+            string title = txtTitulo.Text;
+            string episodeTitle = item.SubItems[2].Text; // Get from column 2
+
+            // If this is the selected item, use the textboxes (which might be edited)
+            if (item.Selected)
+            {
+                int.TryParse(txtTemporada.Text, out season);
+                int.TryParse(txtCapitulo.Text, out episode);
+                title = txtTitulo.Text;
+                episodeTitle = txtTituloEpisodio.Text;
+            }
+            else
+            {
+                // Fallback to parsing filename if not selected/edited
+                if (TryExtractSeasonEpisode(item.Text, out int s, out int e))
                 {
-                    return folderBrowser.SelectedFolders[0];
+                    season = s;
+                    episode = e;
                 }
-                return null;
+            }
+
+            var chapterInfo = new ChapterInfo
+            {
+                Season = season,
+                Chapter = episode,
+                Title = title,
+                EpisodeTitle = episodeTitle
+            };
+
+            try
+            {
+                string nuevoNombreBase = _currentStrategy.GetNewFileName(originalNameNoExt, chapterInfo);
+                item.SubItems[3].Text = nuevoNombreBase + extension;
+            }
+            catch
+            {
+                item.SubItems[3].Text = "Error en vista previa";
             }
         }
         #endregion
@@ -567,7 +703,7 @@ namespace organizadorCapitulos.UI.Forms
         #endregion
 
         #region Validation Methods
-        private void txtNumerico_KeyPress(object sender, KeyPressEventArgs e)
+        private void TxtNumerico_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
             {
@@ -575,7 +711,7 @@ namespace organizadorCapitulos.UI.Forms
             }
         }
 
-        private void txtTemporada_Validating(object? sender, CancelEventArgs e)
+        private void TxtTemporada_Validating(object? sender, CancelEventArgs e)
         {
             if (string.IsNullOrWhiteSpace(txtTemporada.Text) || !int.TryParse(txtTemporada.Text, out int temp) || temp <= 0)
             {
@@ -588,7 +724,7 @@ namespace organizadorCapitulos.UI.Forms
             }
         }
 
-        private void txtCapitulo_Validating(object? sender, CancelEventArgs e)
+        private void TxtCapitulo_Validating(object? sender, CancelEventArgs e)
         {
             if (string.IsNullOrWhiteSpace(txtCapitulo.Text) || !int.TryParse(txtCapitulo.Text, out int cap) || cap <= 0)
             {
@@ -601,7 +737,7 @@ namespace organizadorCapitulos.UI.Forms
             }
         }
 
-        private void txtTitulo_Validating(object? sender, CancelEventArgs e)
+        private void TxtTitulo_Validating(object? sender, CancelEventArgs e)
         {
             if (string.IsNullOrWhiteSpace(txtTitulo.Text))
             {
@@ -619,7 +755,7 @@ namespace organizadorCapitulos.UI.Forms
             }
         }
 
-        private void txtTituloEpisodio_Validating(object? sender, CancelEventArgs e)
+        private void TxtTituloEpisodio_Validating(object? sender, CancelEventArgs e)
         {
             // Solo validar si no es ReadOnly (es decir, entrada manual)
             if (!txtTituloEpisodio.ReadOnly && !string.IsNullOrWhiteSpace(txtTituloEpisodio.Text))
@@ -637,6 +773,11 @@ namespace organizadorCapitulos.UI.Forms
             else
             {
                 errorProvider.SetError(txtTituloEpisodio, "");
+            }
+
+            if (listViewSeries.SelectedItems.Count > 0)
+            {
+                UpdatePreview(listViewSeries.SelectedItems[0]);
             }
         }
 

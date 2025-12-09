@@ -32,10 +32,12 @@ namespace organizadorCapitulos.UI.Forms
             columnHeader1 = new ColumnHeader();
             columnHeader2 = new ColumnHeader();
             columnHeader3 = new ColumnHeader();
+            columnHeader4 = new ColumnHeader();
             btnCargarCarpetas = new Button();
             btnGuardarTodo = new Button();
             btnSettings = new Button();
             btnMetadata = new Button();
+            btnAIAnalyze = new Button();
             tableLayoutPanel1 = new TableLayoutPanel();
             panel1 = new Panel();
             groupBoxOpciones = new GroupBox();
@@ -70,7 +72,7 @@ namespace organizadorCapitulos.UI.Forms
             // 
             listViewSeries.BackColor = Color.FromArgb(250, 251, 252);
             listViewSeries.BorderStyle = BorderStyle.None;
-            listViewSeries.Columns.AddRange(new ColumnHeader[] { columnHeader1, columnHeader2, columnHeader3 });
+            listViewSeries.Columns.AddRange(new ColumnHeader[] { columnHeader1, columnHeader2, columnHeader3, columnHeader4 });
             listViewSeries.Dock = DockStyle.Fill;
             listViewSeries.Font = new Font("Segoe UI", 10F);
             listViewSeries.FullRowSelect = true;
@@ -82,8 +84,8 @@ namespace organizadorCapitulos.UI.Forms
             listViewSeries.TabIndex = 0;
             listViewSeries.UseCompatibleStateImageBehavior = false;
             listViewSeries.View = View.Details;
-            listViewSeries.ColumnClick += listViewSeries_ColumnClick;
-            listViewSeries.SelectedIndexChanged += listViewSeries_SelectedIndexChanged;
+            listViewSeries.ColumnClick += ListViewSeries_ColumnClick;
+            listViewSeries.SelectedIndexChanged += ListViewSeries_SelectedIndexChanged;
             // 
             // columnHeader1
             // 
@@ -97,8 +99,13 @@ namespace organizadorCapitulos.UI.Forms
             // 
             // columnHeader3
             // 
-            columnHeader3.Text = "Nuevo Nombre";
-            columnHeader3.Width = 350;
+            columnHeader3.Text = "Título Episodio";
+            columnHeader3.Width = 250;
+            // 
+            // columnHeader4
+            // 
+            columnHeader4.Text = "Vista Previa";
+            columnHeader4.Width = 350;
             // 
             // btnCargarCarpetas
             // 
@@ -118,7 +125,7 @@ namespace organizadorCapitulos.UI.Forms
             btnCargarCarpetas.Text = "📁 Cargar carpetas";
             btnCargarCarpetas.TextImageRelation = TextImageRelation.ImageBeforeText;
             btnCargarCarpetas.UseVisualStyleBackColor = false;
-            btnCargarCarpetas.Click += btnCargarCarpetas_Click;
+            btnCargarCarpetas.Click += BtnCargarCarpetas_Click;
             // 
             // btnGuardarTodo
             // 
@@ -135,10 +142,10 @@ namespace organizadorCapitulos.UI.Forms
             btnGuardarTodo.Name = "btnGuardarTodo";
             btnGuardarTodo.Size = new Size(165, 38);
             btnGuardarTodo.TabIndex = 2;
-            btnGuardarTodo.Text = "💾 Guardar todo";
+            btnGuardarTodo.Text = "💾 Mover y Renombrar";
             btnGuardarTodo.TextImageRelation = TextImageRelation.ImageBeforeText;
             btnGuardarTodo.UseVisualStyleBackColor = false;
-            btnGuardarTodo.Click += btnGuardarTodo_Click;
+            btnGuardarTodo.Click += BtnGuardarTodo_Click;
             // 
             // btnSettings
             // 
@@ -155,7 +162,7 @@ namespace organizadorCapitulos.UI.Forms
             btnSettings.TabIndex = 6;
             btnSettings.Text = "⚙ Config";
             btnSettings.UseVisualStyleBackColor = false;
-            btnSettings.Click += btnSettings_Click;
+            btnSettings.Click += BtnSettings_Click;
             // 
             // btnMetadata
             // 
@@ -167,16 +174,6 @@ namespace organizadorCapitulos.UI.Forms
             btnMetadata.Font = new Font("Segoe UI Semibold", 10F, FontStyle.Bold);
             btnMetadata.ForeColor = Color.White;
             btnMetadata.Location = new Point(1000, 12);
-            btnMetadata.Name = "btnMetadata";
-            btnMetadata.Size = new Size(160, 38);
-            btnMetadata.TabIndex = 7;
-            btnMetadata.Text = "🔍 Metadatos";
-            btnMetadata.UseVisualStyleBackColor = false;
-            btnMetadata.Click += btnMetadata_Click;
-            // 
-            // tableLayoutPanel1
-            // 
-            tableLayoutPanel1.BackColor = Color.FromArgb(243, 244, 246);
             tableLayoutPanel1.ColumnCount = 1;
             tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
             tableLayoutPanel1.Controls.Add(panel1, 0, 0);
@@ -202,6 +199,7 @@ namespace organizadorCapitulos.UI.Forms
             panel1.Controls.Add(btnGuardarTodo);
             panel1.Controls.Add(btnSettings);
             panel1.Controls.Add(btnMetadata);
+            panel1.Controls.Add(btnAIAnalyze);
             panel1.Dock = DockStyle.Fill;
             panel1.Location = new Point(0, 0);
             panel1.Margin = new Padding(0);
@@ -232,7 +230,7 @@ namespace organizadorCapitulos.UI.Forms
             radioCambiar.TabIndex = 4;
             radioCambiar.Text = "Cambiar estructura";
             radioCambiar.UseVisualStyleBackColor = true;
-            radioCambiar.CheckedChanged += radioCambiar_CheckedChanged;
+            radioCambiar.CheckedChanged += RadioCambiar_CheckedChanged;
             // 
             // radioMantener
             // 
@@ -245,7 +243,7 @@ namespace organizadorCapitulos.UI.Forms
             radioMantener.TabStop = true;
             radioMantener.Text = "Mantener estructura";
             radioMantener.UseVisualStyleBackColor = true;
-            radioMantener.CheckedChanged += radioMantener_CheckedChanged;
+            radioMantener.CheckedChanged += RadioMantener_CheckedChanged;
             // 
             // panel2
             // 
@@ -260,6 +258,8 @@ namespace organizadorCapitulos.UI.Forms
             // 
             // groupBoxDetalles
             // 
+            groupBoxDetalles.Controls.Add(label4);
+            groupBoxDetalles.Controls.Add(txtTituloEpisodio);
             groupBoxDetalles.Controls.Add(btnGuardar);
             groupBoxDetalles.Controls.Add(txtCapitulo);
             groupBoxDetalles.Controls.Add(label3);
@@ -295,7 +295,7 @@ namespace organizadorCapitulos.UI.Forms
             btnGuardar.Text = "✓ Guardar cambios";
             btnGuardar.TextImageRelation = TextImageRelation.ImageBeforeText;
             btnGuardar.UseVisualStyleBackColor = false;
-            btnGuardar.Click += btnGuardar_Click;
+            btnGuardar.Click += BtnGuardar_Click;
             // 
             // txtCapitulo
             // 
@@ -307,8 +307,8 @@ namespace organizadorCapitulos.UI.Forms
             txtCapitulo.Size = new Size(70, 25);
             txtCapitulo.TabIndex = 5;
             txtCapitulo.Text = "1";
-            txtCapitulo.KeyPress += txtNumerico_KeyPress;
-            txtCapitulo.Validating += txtCapitulo_Validating;
+            txtCapitulo.KeyPress += TxtNumerico_KeyPress;
+            txtCapitulo.Validating += TxtCapitulo_Validating;
             // 
             // label3
             // 
@@ -331,8 +331,8 @@ namespace organizadorCapitulos.UI.Forms
             txtTemporada.Size = new Size(70, 25);
             txtTemporada.TabIndex = 3;
             txtTemporada.Text = "1";
-            txtTemporada.KeyPress += txtNumerico_KeyPress;
-            txtTemporada.Validating += txtTemporada_Validating;
+            txtTemporada.KeyPress += TxtNumerico_KeyPress;
+            txtTemporada.Validating += TxtTemporada_Validating;
             // 
             // label2
             // 
@@ -365,12 +365,11 @@ namespace organizadorCapitulos.UI.Forms
             txtTitulo.Name = "txtTitulo";
             txtTitulo.Size = new Size(1395, 25);
             txtTitulo.TabIndex = 0;
-            txtTitulo.KeyDown += onClickEnter;
-            txtTitulo.Validating += txtTitulo_Validating;
+            txtTitulo.KeyDown += OnClickEnter;
+            txtTitulo.Validating += TxtTitulo_Validating;
             // 
             // label4
             // 
-
             label4.Font = new Font("Segoe UI", 9.75F);
             label4.ForeColor = Color.FromArgb(75, 85, 99);
             label4.Location = new Point(20, 63);
@@ -388,8 +387,8 @@ namespace organizadorCapitulos.UI.Forms
             txtTituloEpisodio.Name = "txtTituloEpisodio";
             txtTituloEpisodio.Size = new Size(1395, 25);
             txtTituloEpisodio.TabIndex = 8;
-            txtTituloEpisodio.KeyDown += onClickEnter;
-            txtTituloEpisodio.Validating += txtTituloEpisodio_Validating;
+            txtTituloEpisodio.KeyDown += OnClickEnter;
+            txtTituloEpisodio.Validating += TxtTituloEpisodio_Validating;
             // 
             // errorProvider
             // 
@@ -424,7 +423,7 @@ namespace organizadorCapitulos.UI.Forms
             btnUndo.TabIndex = 2;
             btnUndo.Text = "↶ Deshacer";
             btnUndo.UseVisualStyleBackColor = false;
-            btnUndo.Click += btnUndo_Click;
+            btnUndo.Click += BtnUndo_Click;
             // 
             // btnRedo
             // 
@@ -443,7 +442,7 @@ namespace organizadorCapitulos.UI.Forms
             btnRedo.TabIndex = 1;
             btnRedo.Text = "↷ Rehacer";
             btnRedo.UseVisualStyleBackColor = false;
-            btnRedo.Click += btnRedo_Click;
+            btnRedo.Click += BtnRedo_Click;
             // 
             // lblStatus
             // 
@@ -483,18 +482,18 @@ namespace organizadorCapitulos.UI.Forms
             ResumeLayout(false);
         }
 
-
-
         #endregion
 
         private System.Windows.Forms.ListView listViewSeries;
         private System.Windows.Forms.ColumnHeader columnHeader1;
         private System.Windows.Forms.ColumnHeader columnHeader2;
         private System.Windows.Forms.ColumnHeader columnHeader3;
+        private System.Windows.Forms.ColumnHeader columnHeader4;
         private System.Windows.Forms.Button btnCargarCarpetas;
         private System.Windows.Forms.Button btnGuardarTodo;
         private System.Windows.Forms.Button btnSettings;
         private System.Windows.Forms.Button btnMetadata;
+        private System.Windows.Forms.Button btnAIAnalyze;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.GroupBox groupBoxOpciones;

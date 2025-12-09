@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "organizadorCapitulos", "org
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "organizadorCapitulos.Tests", "organizadorCapitulos.Tests\organizadorCapitulos.Tests.csproj", "{E1ADB0D9-5BF8-4FF8-9FB5-C3484004AAC2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrganizadorCapitulos.Maui", "OrganizadorCapitulos.Maui\OrganizadorCapitulos.Maui.csproj", "{DEA80B7A-3907-4A3E-B162-C62BDB2EE009}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,6 +43,18 @@ Global
 		{E1ADB0D9-5BF8-4FF8-9FB5-C3484004AAC2}.Release|x64.Build.0 = Release|Any CPU
 		{E1ADB0D9-5BF8-4FF8-9FB5-C3484004AAC2}.Release|x86.ActiveCfg = Release|Any CPU
 		{E1ADB0D9-5BF8-4FF8-9FB5-C3484004AAC2}.Release|x86.Build.0 = Release|Any CPU
+		{DEA80B7A-3907-4A3E-B162-C62BDB2EE009}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DEA80B7A-3907-4A3E-B162-C62BDB2EE009}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DEA80B7A-3907-4A3E-B162-C62BDB2EE009}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{DEA80B7A-3907-4A3E-B162-C62BDB2EE009}.Debug|x64.Build.0 = Debug|Any CPU
+		{DEA80B7A-3907-4A3E-B162-C62BDB2EE009}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{DEA80B7A-3907-4A3E-B162-C62BDB2EE009}.Debug|x86.Build.0 = Debug|Any CPU
+		{DEA80B7A-3907-4A3E-B162-C62BDB2EE009}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DEA80B7A-3907-4A3E-B162-C62BDB2EE009}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DEA80B7A-3907-4A3E-B162-C62BDB2EE009}.Release|x64.ActiveCfg = Release|Any CPU
+		{DEA80B7A-3907-4A3E-B162-C62BDB2EE009}.Release|x64.Build.0 = Release|Any CPU
+		{DEA80B7A-3907-4A3E-B162-C62BDB2EE009}.Release|x86.ActiveCfg = Release|Any CPU
+		{DEA80B7A-3907-4A3E-B162-C62BDB2EE009}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

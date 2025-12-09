@@ -42,25 +42,24 @@ namespace organizadorCapitulos.Infrastructure.Services
                 response.EnsureSuccessStatusCode();
 
                 var json = await response.Content.ReadAsStringAsync();
-                using (JsonDocument doc = JsonDocument.Parse(json))
+                using JsonDocument doc = JsonDocument.Parse(json);
+
+                var results = new List<SeriesSearchResult>();
+                if (doc.RootElement.TryGetProperty("results", out JsonElement resultsElement))
                 {
-                    var results = new List<SeriesSearchResult>();
-                    if (doc.RootElement.TryGetProperty("results", out JsonElement resultsElement))
+                    foreach (var element in resultsElement.EnumerateArray())
                     {
-                        foreach (var element in resultsElement.EnumerateArray())
+                        results.Add(new SeriesSearchResult
                         {
-                            results.Add(new SeriesSearchResult
-                            {
-                                Id = element.GetProperty("id").GetInt32(),
-                                Name = element.TryGetProperty("name", out var name) ? (name.GetString() ?? "Unknown") : "Unknown",
-                                OriginalName = element.TryGetProperty("original_name", out var originalName) ? (originalName.GetString() ?? "Unknown") : "Unknown",
-                                FirstAirDate = element.TryGetProperty("first_air_date", out var date) ? (date.GetString() ?? "") : "",
-                                Overview = element.TryGetProperty("overview", out var overview) ? (overview.GetString() ?? "") : ""
-                            });
-                        }
+                            Id = element.GetProperty("id").GetInt32(),
+                            Name = element.TryGetProperty("name", out var name) ? (name.GetString() ?? "Unknown") : "Unknown",
+                            OriginalName = element.TryGetProperty("original_name", out var originalName) ? (originalName.GetString() ?? "Unknown") : "Unknown",
+                            FirstAirDate = element.TryGetProperty("first_air_date", out var date) ? (date.GetString() ?? "") : "",
+                            Overview = element.TryGetProperty("overview", out var overview) ? (overview.GetString() ?? "") : ""
+                        });
                     }
-                    return results;
                 }
+                return results;
             }
             catch (Exception ex)
             {
@@ -82,11 +81,71 @@ namespace organizadorCapitulos.Infrastructure.Services
                 if (!response.IsSuccessStatusCode) return null;
 
                 var json = await response.Content.ReadAsStringAsync();
-                using (JsonDocument doc = JsonDocument.Parse(json))
+                using JsonDocument doc = JsonDocument.Parse(json);
+
+                if (doc.RootElement.TryGetProperty("name", out JsonElement nameElement))
                 {
-                    if (doc.RootElement.TryGetProperty("name", out JsonElement nameElement))
+                    return nameElement.GetString();
+                }
+                return null;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        public async Task<(int season, int episode, string title)?> FindEpisodeByTitleAsync(int seriesId, string episodeTitle)
+        {
+            if (!IsConfigured()) throw new InvalidOperationException("API Key not configured.");
+            if (string.IsNullOrWhiteSpace(episodeTitle)) return null;
+
+            // Normalize the search title
+            string searchTitle = episodeTitle.Trim().ToLowerInvariant();
+
+            try
+            {
+                // First, get the series info to know how many seasons there are
+                string seriesUrl = $"{BaseUrl}/tv/{seriesId}?api_key={_apiKey}&language=es-ES";
+                var seriesResponse = await _httpClient.GetAsync(seriesUrl);
+                if (!seriesResponse.IsSuccessStatusCode) return null;
+
+                var seriesJson = await seriesResponse.Content.ReadAsStringAsync();
+                int numberOfSeasons = 1;
+
+                using JsonDocument seriesDoc = JsonDocument.Parse(seriesJson);
+
+                if (seriesDoc.RootElement.TryGetProperty("number_of_seasons", out JsonElement seasonsElement))
+                {
+                    numberOfSeasons = seasonsElement.GetInt32();
+                }
+
+                // Search through each season
+                for (int season = 1; season <= numberOfSeasons; season++)
+                {
+                    string seasonUrl = $"{BaseUrl}/tv/{seriesId}/season/{season}?api_key={_apiKey}&language=es-ES";
+                    var seasonResponse = await _httpClient.GetAsync(seasonUrl);
+                    if (!seasonResponse.IsSuccessStatusCode) continue;
+
+                    var seasonJson = await seasonResponse.Content.ReadAsStringAsync();
+                    using JsonDocument seasonDoc = JsonDocument.Parse(seasonJson);
+
+                    if (seasonDoc.RootElement.TryGetProperty("episodes", out JsonElement episodesElement))
                     {
-                        return nameElement.GetString();
+                        foreach (var ep in episodesElement.EnumerateArray())
+                        {
+                            if (ep.TryGetProperty("name", out JsonElement nameElement))
+                            {
+                                string? epName = nameElement.GetString();
+                                if (epName != null &&
+                                    (epName.Contains(searchTitle, StringComparison.OrdinalIgnoreCase) ||
+                                     searchTitle.Contains(epName, StringComparison.OrdinalIgnoreCase)))
+                                {
+                                    int epNumber = ep.GetProperty("episode_number").GetInt32();
+                                    return (season, epNumber, epName);
+                                }
+                            }
+                        }
                     }
                 }
                 return null;

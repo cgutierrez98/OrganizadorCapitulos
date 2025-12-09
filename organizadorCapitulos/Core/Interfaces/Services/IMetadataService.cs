@@ -8,6 +8,7 @@ namespace organizadorCapitulos.Core.Interfaces.Services
     {
         Task<List<SeriesSearchResult>> SearchSeriesAsync(string query);
         Task<string?> GetEpisodeTitleAsync(int seriesId, int season, int episode);
+        Task<(int season, int episode, string title)?> FindEpisodeByTitleAsync(int seriesId, string episodeTitle);
         bool IsConfigured();
         void Configure(string apiKey);
     }
