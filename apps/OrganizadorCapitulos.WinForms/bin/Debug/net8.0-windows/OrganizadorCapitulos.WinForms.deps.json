@@ -1,0 +1,56 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v8.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v8.0": {
+      "OrganizadorCapitulos.WinForms/1.0.0": {
+        "dependencies": {
+          "OrganizadorCapitulos.Application": "1.0.0",
+          "OrganizadorCapitulos.Core": "1.0.0"
+        },
+        "runtime": {
+          "OrganizadorCapitulos.WinForms.dll": {}
+        }
+      },
+      "OrganizadorCapitulos.Application/1.0.0": {
+        "dependencies": {
+          "OrganizadorCapitulos.Core": "1.0.0"
+        },
+        "runtime": {
+          "OrganizadorCapitulos.Application.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "OrganizadorCapitulos.Core/1.0.0": {
+        "runtime": {
+          "OrganizadorCapitulos.Core.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "OrganizadorCapitulos.WinForms/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "OrganizadorCapitulos.Application/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "OrganizadorCapitulos.Core/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}
