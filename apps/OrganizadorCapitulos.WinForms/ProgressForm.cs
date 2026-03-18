@@ -2,7 +2,7 @@ using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
-using organizadorCapitulos.Core.Interfaces.Observers;
+using OrganizadorCapitulos.Core.Interfaces.Observers;
 
 namespace OrganizadorCapitulos.WinForms.UI.Forms
 {

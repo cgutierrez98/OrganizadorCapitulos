@@ -6,18 +6,18 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Drawing;
-using organizadorCapitulos.Application.Commands;
-using organizadorCapitulos.Application.Comparers;
-using organizadorCapitulos.Application.Services;
-using organizadorCapitulos.Application.Strategies;
-using organizadorCapitulos.Core.Entities;
-using organizadorCapitulos.Core.Enums;
-using organizadorCapitulos.Core.Interfaces.Observers;
-using organizadorCapitulos.Core.Interfaces.Repositories;
-using organizadorCapitulos.Core.Interfaces.Services;
-using organizadorCapitulos.Core.Interfaces.Strategies;
-using organizadorCapitulos.Infrastructure.Repositories;
-using organizadorCapitulos.Infrastructure.Services;
+using OrganizadorCapitulos.Application.Commands;
+using OrganizadorCapitulos.Application.Comparers;
+using OrganizadorCapitulos.Application.Services;
+using OrganizadorCapitulos.Application.Strategies;
+using OrganizadorCapitulos.Core.Entities;
+using OrganizadorCapitulos.Core.Enums;
+using OrganizadorCapitulos.Core.Interfaces.Observers;
+using OrganizadorCapitulos.Core.Interfaces.Repositories;
+using OrganizadorCapitulos.Core.Interfaces.Services;
+using OrganizadorCapitulos.Core.Interfaces.Strategies;
+using OrganizadorCapitulos.Infrastructure.Repositories;
+using OrganizadorCapitulos.Infrastructure.Services;
 using SortOrder = System.Windows.Forms.SortOrder;
 
 namespace OrganizadorCapitulos.WinForms.UI.Forms
@@ -115,7 +115,7 @@ namespace OrganizadorCapitulos.WinForms.UI.Forms
                 return;
             }
 
-            var chapterInfo = new organizadorCapitulos.Core.Entities.ChapterInfo
+            var chapterInfo = new ChapterInfo
             {
                 Season = temporada,
                 Chapter = capitulo,
@@ -135,7 +135,7 @@ namespace OrganizadorCapitulos.WinForms.UI.Forms
 
                 string nuevoFilePath = Path.Combine(directory, nuevoNombreBase + extension);
 
-                var renameCommand = new organizadorCapitulos.Application.Commands.RenameFileCommand(_fileRepository, originalFilePath, nuevoFilePath);
+                var renameCommand = new RenameFileCommand(_fileRepository, originalFilePath, nuevoFilePath);
                 await _commandManager.ExecuteCommandAsync(renameCommand);
 
                 _currentStrategy.UpdateAfterRename(chapterInfo);
@@ -183,7 +183,7 @@ namespace OrganizadorCapitulos.WinForms.UI.Forms
 
             try
             {
-                var moveCommand = new organizadorCapitulos.Application.Commands.MoveFilesCommand(_fileRepository, progressForm, sourcePaths, carpetaDestino);
+                var moveCommand = new MoveFilesCommand(_fileRepository, progressForm, sourcePaths, carpetaDestino);
                 await _commandManager.ExecuteCommandAsync(moveCommand);
 
                 for (int i = 0; i < listViewSeries.Items.Count; i++)
@@ -384,7 +384,7 @@ namespace OrganizadorCapitulos.WinForms.UI.Forms
                 }
             }
 
-            var chapterInfo = new organizadorCapitulos.Core.Entities.ChapterInfo
+            var chapterInfo = new ChapterInfo
             {
                 Season = season,
                 Chapter = episode,
@@ -495,7 +495,7 @@ namespace OrganizadorCapitulos.WinForms.UI.Forms
             }
         }
 
-        void organizadorCapitulos.Core.Interfaces.Observers.IProgressObserver.UpdateStatus(string status)
+        void IProgressObserver.UpdateStatus(string status)
         {
             UpdateStatus(status);
         }
