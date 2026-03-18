@@ -1,3 +1,0 @@
-D:\OrganizadorCaps\organizadorCapitulos.pdb
-D:\OrganizadorCaps\Assets\Logo.ico
-D:\OrganizadorCaps\organizadorCapitulos.exe
