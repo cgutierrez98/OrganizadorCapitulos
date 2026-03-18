@@ -1,0 +1,52 @@
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Visual Studio, Rider, VS Code
+.vs/
+.vscode/
+.idea/
+*.suo
+*.user
+*.userosscache
+*.DotSettings.user
+
+# Build outputs
+**/bin/
+**/obj/
+**/publish/
+*.exe
+*.dll
+*.pdb
+*.ilk
+
+# NuGet / packages
+packages/
+*.nupkg
+*.snupkg
+project.lock.json
+artifacts/
+
+# Test results & coverage
+TestResults/
+coverage/
+*.coverage
+*.coveragexml
+*.trx
+
+# Node (if any subprojects)
+node_modules/
+
+# Secrets / env
+.env
+secrets.json
+secret*.json
+
+# Logs & temp
+*.log
+*.tmp
+*.temp
+
+# Misc
+*.userprefs

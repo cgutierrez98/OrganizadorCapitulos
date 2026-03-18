@@ -1,0 +1,15 @@
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using OrganizadorCapitulos.Core.Entities;
+
+namespace OrganizadorCapitulos.Core.Interfaces.Services
+{
+    public interface IMetadataService
+    {
+        Task<List<SeriesSearchResult>> SearchSeriesAsync(string query);
+        Task<string?> GetEpisodeTitleAsync(int seriesId, int season, int episode);
+        Task<(int season, int episode, string title)?> FindEpisodeByTitleAsync(int seriesId, string episodeTitle);
+        bool IsConfigured();
+        void Configure(string apiKey);
+    }
+}
